@@ -14,8 +14,8 @@ public class Player {
 
     private int totalGoals;
     private int totalMistakes;
-    private int totalRescues; // For goalkeepers
-    private double totalMep; // Total Most Effective Player value
+    private int totalRescues;
+    private double totalMep;
 
     @ManyToOne
     private Team team;
@@ -23,5 +23,4 @@ public class Player {
     @OneToMany(mappedBy = "player")
     private Set<PlayerMatchStats> matchStats;
 
-    // Constructors, getters, and setters
 }

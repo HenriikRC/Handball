@@ -12,8 +12,8 @@ public class PlayerMatchStats {
 
     private int goals;
     private int mistakes;
-    private int rescues; // Assuming this is only for goalkeepers in a match
-    private double mep; // Most Effective Player value for the match
+    private int rescues;
+    private double mep;
 
     @ManyToOne
     @JoinColumn(name = "player_id")
@@ -23,5 +23,4 @@ public class PlayerMatchStats {
     @JoinColumn(name = "match_id")
     private Match match;
 
-    // Constructors, getters, and setters
 }
