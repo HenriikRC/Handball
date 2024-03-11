@@ -1,10 +1,12 @@
 package cps.handball.match;
 
+import cps.handball.playeraction.PlayerAction;
 import cps.handball.playermatchstats.PlayerMatchStats;
 import jakarta.persistence.*;
 import cps.handball.team.Team;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -18,11 +20,23 @@ public class Match {
     private int homeTeamGoals;
     private int awayTeamGoals;
 
+    public String getMatchSiteLink() {
+        return matchSiteLink;
+    }
+
+    public void setMatchSiteLink(String matchSiteLink) {
+        this.matchSiteLink = matchSiteLink;
+    }
+
+    private String matchSiteLink;
+
     @ManyToOne
     private Team homeTeam;
 
     @ManyToOne
     private Team awayTeam;
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<PlayerAction> playerActions = new HashSet<>();
 
     @OneToMany(mappedBy = "match")
     private Set<PlayerMatchStats> playerStats;
@@ -99,5 +113,18 @@ public class Match {
 
     public void setPlayerAnalysisLink(String playerAnalysisLink) {
         this.playerAnalysisLink = playerAnalysisLink;
+    }
+
+    public Set<PlayerAction> getPlayerActions() {
+        return playerActions;
+    }
+
+    public void setPlayerActions(Set<PlayerAction> playerActions) {
+        this.playerActions = playerActions;
+    }
+
+    public void addPlayerAction(PlayerAction playerAction) {
+        playerActions.add(playerAction);
+        playerAction.setMatch(this);
     }
 }

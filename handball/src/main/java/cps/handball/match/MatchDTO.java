@@ -9,11 +9,21 @@ public class MatchDTO {
     private int awayTeamGoals;
     private String playerAnalysisLink;
 
+    public String getMatchSiteLink() {
+        return matchSiteLink;
+    }
+
+    public void setMatchSiteLink(String matchSiteLink) {
+        this.matchSiteLink = matchSiteLink;
+    }
+
+    private String matchSiteLink;
+
 
     public MatchDTO() {
     }
 
-    public MatchDTO(Long id, String matchTime, String homeTeamName, String awayTeamName, int homeTeamGoals, int awayTeamGoals, String playerAnalysisLink) {
+    public MatchDTO(Long id, String matchTime, String homeTeamName, String awayTeamName, int homeTeamGoals, int awayTeamGoals, String playerAnalysisLink, String matchSiteLink) {
         this.id = id;
         this.matchTime = matchTime;
         this.homeTeamName = homeTeamName;
@@ -21,6 +31,7 @@ public class MatchDTO {
         this.homeTeamGoals = homeTeamGoals;
         this.awayTeamGoals = awayTeamGoals;
         this.playerAnalysisLink = playerAnalysisLink;
+        this.matchSiteLink = matchSiteLink;
     }
 
     public Long getId() {

@@ -32,7 +32,8 @@ public class MatchService {
                 match.getAwayTeam().getName(),
                 match.getHomeTeamGoals(),
                 match.getAwayTeamGoals(),
-                match.getPlayerAnalysisLink()
+                match.getPlayerAnalysisLink(),
+                match.getMatchSiteLink()
         )).collect(Collectors.toList());
 
     }

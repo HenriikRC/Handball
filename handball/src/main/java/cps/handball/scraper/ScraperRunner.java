@@ -8,13 +8,19 @@ import org.springframework.stereotype.Component;
 public class ScraperRunner implements CommandLineRunner {
 
     private final MatchScraperService matchScraperService;
+    private final TeamScraper teamScraper;
+    private final PlayerScraper playerScraper;
 
-    @Autowired
-    public ScraperRunner(MatchScraperService matchScraperService){
+    public ScraperRunner(MatchScraperService matchScraperService, TeamScraper teamScraper, PlayerScraper playerScraper) {
         this.matchScraperService = matchScraperService;
+        this.teamScraper = teamScraper;
+        this.playerScraper = playerScraper;
     }
+
     @Override
     public void run(String... args) throws Exception {
+        String overviewUrl = "https://tophaandbold.dk/klubber/herreligaen";
+        teamScraper.scrapeTeams(overviewUrl);
         matchScraperService.scrape();
     }
 }

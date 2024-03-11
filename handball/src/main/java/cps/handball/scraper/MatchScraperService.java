@@ -81,6 +81,11 @@ public class MatchScraperService {
                 String playerAnalysisLink = row.select(".dropdown-item").eq(1).attr("abs:href"); // Using .eq(1) to select the second dropdown-item
                 match.setPlayerAnalysisLink(playerAnalysisLink);
 
+                String matchSiteLink = row.select(".match-program__row__livescore a").attr("abs:href");
+                if(matchSiteLink.contains("https://tophaandbold.dk")){
+                    match.setMatchSiteLink(matchSiteLink);
+                }
+
                 saveMatchWithTeams(match);
             }
 
