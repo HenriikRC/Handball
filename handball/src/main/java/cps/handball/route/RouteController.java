@@ -4,6 +4,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.BufferedReader;
@@ -17,8 +18,15 @@ public class RouteController {
 
     @GetMapping("/matches")
     @ResponseBody
-    public String matchOverview() throws IOException{
+    public String matchOverviewPage() throws IOException{
         return convertToString("matchOverview");
+    }
+
+    @GetMapping("/live/match/{matchId}")
+    @ResponseBody
+    public String liveMatchPage(@PathVariable("matchId") Long matchId) throws IOException{
+        System.out.println(matchId);
+        return convertToString("liveMatch");
     }
 
 

@@ -19,8 +19,8 @@ public class ScraperRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String overviewUrl = "https://tophaandbold.dk/klubber/herreligaen";
-        teamScraper.scrapeTeams(overviewUrl);
-        matchScraperService.scrape();
+        //String overviewUrl = "https://tophaandbold.dk/klubber/herreligaen";
+        //teamScraper.scrapeTeams(overviewUrl);
+        //matchScraperService.scrape();
     }
 }

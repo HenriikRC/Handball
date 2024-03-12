@@ -2,22 +2,26 @@ package cps.handball.playeraction;
 
 import cps.handball.match.Match;
 import cps.handball.player.Player;
-import jakarta.persistence.*;
 
-@Entity
-public class PlayerAction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PlayerActionDTO {
+
     private Long id;
-    @ManyToOne
     private Player player;
-    @ManyToOne
     private Player opponentPlayer;
-    @ManyToOne
     private Match match;
     private String matchTime;
     private ActionType actionType;
     private double mepRatingChange;
+
+    public PlayerActionDTO(Long id, Player player, Player opponentPlayer, Match match, String matchTime, ActionType actionType, double mepRatingChange) {
+        this.id = id;
+        this.player = player;
+        this.opponentPlayer = opponentPlayer;
+        this.match = match;
+        this.matchTime = matchTime;
+        this.actionType = actionType;
+        this.mepRatingChange = mepRatingChange;
+    }
 
     public Long getId() {
         return id;
@@ -34,6 +38,7 @@ public class PlayerAction {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
 
     public Player getOpponentPlayer() {
         return opponentPlayer;

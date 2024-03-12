@@ -6,7 +6,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,9 +13,8 @@ import java.io.IOException;
 @Service
 public class TeamScraper {
 
-    private TeamService teamService;
-
-    private PlayerScraper playerScraper;
+    private final TeamService teamService;
+    private final PlayerScraper playerScraper;
 
     public TeamScraper(PlayerScraper playerScraper, TeamService teamService){
         this.playerScraper = playerScraper;
