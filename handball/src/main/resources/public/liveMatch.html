@@ -115,6 +115,7 @@
       position: absolute;
       top: 20%;
       left: 47.5%;
+      opacity: 0;
     }
 
     .banner1 {
@@ -132,6 +133,41 @@
       left: 35%;
     }
 
+    .throwingPlayerInfo{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .throwingPlayer {
+      font-size: 3vh;
+      height: 3vh;
+    }
+
+    .actionInfo{
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .centerLine {
+      display: inline;
+    }
+
+    .topLine {
+      display: inline;
+    }
+
+    .image {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -146,34 +182,73 @@
     <div class="goal field bottom"></div>
     <div class="goal bottom" id="goalBottom"></div>
 
-
     <img class="ball" id="ball" src="/assets/handball/ball.png">
 
+    <div class="actionInfo" id="ACTION_INFO">
+      <div class="throwingPlayer">
+        <img class="throwingPlayer topLine" src="" id="THROWING_PLAYER_TEAM_IMAGE">
+        <p class="throwingPlayer topLine" id="THROWING_PLAYER_NUMBER"></p>
+        <p class="throwingPlayer topLine playerName" id="THROWING_PLAYER_NAME"></p>
+      </div>
+      <p class="throwingPlayer centerLine" id="MATCH_TIME">
+      </p>
+      <p class="throwingPlayer centerLine"> -
+      </p>
+      <p class="throwingPlayer centerLine" id="THROWING_PLAYER_ACTION">
+      </p>
+    </div>
     <!--<div class="sponsor banner1"></div>
     <div class="sponsor banner2"></div>
     <div class="sponsor banner3"></div> -->
 
-    <div class="player team1" id="HOME_KEEPER" style="top: 0; left: 47.5%;"></div>
-    <div class="player team1" id="HOME_CENTER_3" style="top: 19.5%; left: 38%;"></div>
-    <div class="player team1" id="HOME_RIGHT_WING" style="top: 5%; left: 14%;"></div>
-    <div class="player team1" id="HOME_CENTER_4" style="top: 19.5%; right: 38%;"></div>
-    <div class="player team1" id="HOME_LEFT_WING" style="top: 5%; right: 14%;"></div>
-    <div class="player team1" id="HOME_RIGHT_BACK" style="top: 15%; left: 22%;"></div>
-    <div class="player team1" id="HOME_LEFT_BACK" style="top: 15%; right: 22%;"></div>
-
-    <div class="player team2" id="AWAY_KEEPER" style="top: 1%; left: 2%;"></div>
-    <div class="player team2" id="AWAY_LEFT_BACK" style="top: 26.5%; left: 15%;">
-      <img class="player" src="/assets/henne.jpg">
+    <div class="player team1" id="HOME_KEEPER" style="top: 0; left: 47.5%;">
+      <img class ="player image" id="HOME_KEEPER_IMAGE" src="">
     </div>
-    <div class="player team2" id="AWAY_PLAYMAKER" style="top: 30.5%; left: 47.5%;"></div>
-    <div class="player team2" id="AWAY_RIGHT_BACK" style="top: 26.5%; right: 15%;"></div>
-    <div class="player team2" id="AWAY_CENTER" style="top: 19.5%; left: 47.5%;"></div>
-    <div class="player team2" id="AWAY_RIGHT_WING" style="top: 1%; right: 2%;"></div>
-    <div class="player team2" id="AWAY_LEFT_WING" style="bottom: 0; left: 47.5%;"></div>
+    <div class="player team1" id="HOME_CENTER_3" style="top: 19.5%; left: 38%;">
+      <img class ="player image" id="HOME_CENTER_3_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_RIGHT_WING" style="top: 5%; left: 14%;">
+      <img class ="player image" id="HOME_RIGHT_WING_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_CENTER_4" style="top: 19.5%; left: 57%;">
+      <img class ="player image" id="HOME_CENTER_4_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_LEFT_WING" style="top: 5%; left: 80%;">
+      <img class ="player image" id="HOME_LEFT_WING_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_RIGHT_BACK" style="top: 15%; left: 22%;">
+      <img class ="player image" id="HOME_RIGHT_BACK_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_LEFT_BACK" style="top: 15%; left: 72%;">
+      <img class ="player image" id="HOME_LEFT_BACK_IMAGE" src="">
+    </div>
+
+    <div class="player team2" id="AWAY_LEFT_WING" style="top: 1%; left: 2%;">
+      <img class ="player image" id="AWAY_LEFT_WING_IMAGE" src="">
+    </div>
+    <div class="player team2" id="AWAY_LEFT_BACK" style="top: 26.5%; left: 15%;">
+      <img class="player image" id="AWAY_LEFT_BACK_IMAGE" src="/assets/henne.jpg">
+    </div>
+    <div class="player team2" id="AWAY_PLAYMAKER" style="top: 30.5%; left: 47.5%;">
+      <img class ="player image" id="AWAY_PLAYMAKER_IMAGE" src="">
+    </div>
+    <div class="player team2" id="AWAY_RIGHT_BACK" style="top: 26.5%; left: 80%;">
+      <img class ="player image" id="AWAY_RIGHT_BACK_IMAGE" src="http://localhost:8080/assets/henne.jpg">
+    </div>
+    <div class="player team2" id="AWAY_CENTER" style="top: 19.5%; left: 47.5%;">
+      <img class ="player image" id="AWAY_CENTER_IMAGE" src="">
+    </div>
+    <div class="player team2" id="AWAY_RIGHT_WING" style="top: 1%; left: 92%;">
+      <img class ="player image" id="AWAY_RIGHT_WING_IMAGE" src="">
+    </div>
+    <div class="player team2" id="AWAY_KEEPER" style="top: 93.5%; left: 47.5%;">
+      <img class ="player image" id="AWAY_KEEPER_IMAGE" src="">
+    </div>
+
 
   </div>
   <div class="side">
-    <button onclick="throwBall()">Throw Ball</button>
+    <button onclick="action()">Throw Ball</button>
   </div>
 </div>
 </body>

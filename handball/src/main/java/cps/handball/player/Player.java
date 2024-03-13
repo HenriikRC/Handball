@@ -22,6 +22,8 @@ public class Player {
     private double totalMep;
     private PositionType positionType;
 
+    private String playerImageLink;
+
     @ManyToOne
     private Team team;
 
@@ -122,5 +124,13 @@ public class Player {
     public void addPlayerAction(PlayerAction playerAction) {
         playerActions.add(playerAction);
         playerAction.setPlayer(this);
+    }
+
+    public String getPlayerImageLink() {
+        return playerImageLink;
+    }
+
+    public void setPlayerImageLink(String playerImageLink) {
+        this.playerImageLink = playerImageLink;
     }
 }
