@@ -1,26 +1,52 @@
+const throwingPlayer = 'AWAY_RIGHT_WING';
+const opponentPlayer = 'HOME_KEEPER';
+const assistingPlayer = null;
+
 function throwBall() {
     const ball = document.getElementById('ball');
+    const player = document.getElementById(throwingPlayer);
+    const field = document.querySelector('.field'); // Assuming the players are within this container
 
-    ball.style.display = 'absolute';
+    if (!player || !field) {
+        console.error("Throwing player or field not found:", throwingPlayer);
+        return;
+    }
+
+    // Get bounding rectangles
+    const playerRect = player.getBoundingClientRect();
+    const fieldRect = field.getBoundingClientRect();
+
+    // Calculate player's position relative to the field, not the entire window
+    const playerXRelativeToField = ((playerRect.left + playerRect.right) / 2) - fieldRect.left;
+    const playerYRelativeToField = ((playerRect.top + playerRect.bottom) / 2) - fieldRect.top;
+
+    // Convert these positions to percentages of the field's dimensions
+    const playerXPercentage = `${(playerXRelativeToField / fieldRect.width) * 100}%`;
+    const playerYPercentage = `${(playerYRelativeToField / fieldRect.height) * 100}%`;
+
+    ball.style.position = 'absolute';
     ball.style.opacity = '1';
-    ball.style.top = '26.5%';
-    ball.style.left = '18%';
-    ball.style.transform = 'translate(-50%, 0%)';
+    ball.style.top = playerYPercentage;
+    ball.style.left = playerXPercentage;
+    // Adjusting transform to center the ball on the calculated position
+    ball.style.transform = 'translate(-50%, -50%)';
 
-    ball.animate([
-        { top: '26.5%', left: '18%', transform: 'rotate(0deg)' },
+    const keyframes = [
+        { top: playerYPercentage, left: playerXPercentage, transform: 'rotate(0deg)'},
         { top: '-6.4vh', left: '50%', transform: 'rotate(1060deg)'}
-    ], {
+    ];
+
+    ball.animate(keyframes, {
         duration: 2000,
         fill: 'forwards'
     });
 
     setTimeout(() => {
-        ball.setAttribute("style", "top: 50% !important")
+        ball.setAttribute("style", "top: 50% !important");
         ball.style.left = '50%';
         ball.style.transform = 'translate(-50%, -50%)';
         ball.style.opacity = '0';
-        }, 4500);
+    }, 4500);
 }
 
 function checkGoal() {
