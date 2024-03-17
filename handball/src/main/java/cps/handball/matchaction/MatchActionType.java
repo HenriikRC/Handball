@@ -1,0 +1,28 @@
+package cps.handball.matchaction;
+
+public enum MatchActionType {
+    START,
+    PAUSE,
+    PAUSE_END,
+    FULL_TIME,
+    END,
+    GOAL,
+    PENALTY_GOAL,
+    PENALTY_MISS,
+    PENALTY_SAVE,
+    MISSED,
+    SAVED,
+    BLOCKED,
+    BLOCKED_RETURN,
+    PASS_MISTAKE,
+    MISTAKE,
+    POLE_HIT,
+    POLE_HIT_RETURN,
+    YELLOW_CARD,
+    RED_CARD,
+    BLUE_CARD,
+    TWO_MIN,
+    PASSIVE_PLAY,
+    TEAM_TIMEOUT,
+    LOST_BALL,
+}

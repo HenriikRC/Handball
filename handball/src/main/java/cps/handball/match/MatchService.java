@@ -34,6 +34,13 @@ public class MatchService {
                 match.getPlayerAnalysisLink(),
                 match.getMatchSiteLink()
         )).collect(Collectors.toList());
+    }
 
+    public List<Match> findUnfinishedMatches() {
+        return matchRepository.findByisFinishedFalse();
+    }
+
+    public Match findMatchById(Long id) {
+        return matchRepository.findMatchById(id);
     }
 }

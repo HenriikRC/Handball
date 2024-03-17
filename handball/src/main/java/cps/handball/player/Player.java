@@ -1,6 +1,6 @@
 package cps.handball.player;
 
-import cps.handball.playeraction.PlayerAction;
+import cps.handball.matchaction.MatchAction;
 import cps.handball.playermatchstats.PlayerMatchStats;
 import jakarta.persistence.*;
 import cps.handball.team.Team;
@@ -31,7 +31,7 @@ public class Player {
     private Set<PlayerMatchStats> matchStats;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<PlayerAction> playerActions = new HashSet<>();
+    private Set<MatchAction> matchActions = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -113,17 +113,17 @@ public class Player {
         this.matchStats = matchStats;
     }
 
-    public Set<PlayerAction> getPlayerActions() {
-        return playerActions;
+    public Set<MatchAction> getPlayerActions() {
+        return matchActions;
     }
 
-    public void setPlayerActions(Set<PlayerAction> playerActions) {
-        this.playerActions = playerActions;
+    public void setPlayerActions(Set<MatchAction> matchActions) {
+        this.matchActions = matchActions;
     }
 
-    public void addPlayerAction(PlayerAction playerAction) {
-        playerActions.add(playerAction);
-        playerAction.setPlayer(this);
+    public void addPlayerAction(MatchAction matchAction) {
+        matchActions.add(matchAction);
+        matchAction.setPlayer(this);
     }
 
     public String getPlayerImageLink() {

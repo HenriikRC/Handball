@@ -19,7 +19,7 @@ public class Team {
     private int goalsTotal;
     private int goalsAgainstTotal;
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     private Set<Player> players;
 
     @OneToMany(mappedBy = "homeTeam")

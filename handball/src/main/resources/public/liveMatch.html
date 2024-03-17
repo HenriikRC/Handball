@@ -84,13 +84,13 @@
       border-width: medium;
     }
 
-
     .player {
       width: 5vh;
       height: 5vh;
       border-radius: 50%;
       position: absolute;
     }
+
 
     .team1 {
       background-color: #ff0000;
@@ -133,20 +133,9 @@
       left: 35%;
     }
 
-    .throwingPlayerInfo{
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .throwingPlayer {
-      font-size: 3vh;
-      height: 3vh;
-    }
-
-    .actionInfo{
+    .actionInfo {
       display: none;
+      flex-direction: column;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -154,16 +143,29 @@
       background-color: white;
       padding: 10px;
       border-radius: 10px;
+      text-align: center;
     }
 
-    .centerLine {
-      display: inline;
+    .playerInfo, .actionDetail {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      width: 100%;
+      justify-content: left;
+      align-items: center;
+      margin: 5px 0;
     }
 
-    .topLine {
-      display: inline;
+    .playerImage {
+      width: 5vh;
+      height: auto;
+      margin-right: 5px;
     }
 
+    .playerNumber, .playerName, #MATCH_TIME, #THROWING_PLAYER_ACTION {
+      font-size: 3vh;
+      margin: 0 5px;
+    }
     .image {
       display: none;
     }
@@ -185,18 +187,27 @@
     <img class="ball" id="ball" src="/assets/handball/ball.png">
 
     <div class="actionInfo" id="ACTION_INFO">
-      <div class="throwingPlayer">
-        <img class="throwingPlayer topLine" src="" id="THROWING_PLAYER_TEAM_IMAGE">
-        <p class="throwingPlayer topLine" id="THROWING_PLAYER_NUMBER"></p>
-        <p class="throwingPlayer topLine playerName" id="THROWING_PLAYER_NAME"></p>
-      </div>
-      <p class="throwingPlayer centerLine" id="MATCH_TIME">
-      </p>
-      <p class="throwingPlayer centerLine"> -
-      </p>
-      <p class="throwingPlayer centerLine" id="THROWING_PLAYER_ACTION">
-      </p>
+    <div class="playerInfo mainPlayer" id="THROWING_PLAYER">
+      <img src="" class="playerImage" id="THROWING_PLAYER_TEAM_IMAGE">
+      <p class="playerNumber" id="THROWING_PLAYER_NUMBER"></p>
+      <p class="playerName" id="THROWING_PLAYER_NAME"></p>
     </div>
+    <div class="playerInfo assistingPlayer" id="ASSISTING_PLAYER" style="display: none;">
+      <img src="" class="playerImage" id="ASSISTING_PLAYER_TEAM_IMAGE">
+      <p class="playerNumber" id="ASSISTING_PLAYER_NUMBER"></p>
+      <p class="playerName" id="ASSISTING_PLAYER_NAME"></p>
+    </div>
+    <div class="actionDetail">
+      <p id="MATCH_TIME"></p>
+      <p>-</p>
+      <p id="THROWING_PLAYER_ACTION"></p>
+    </div>
+    <div class="playerInfo opponentPlayer" id="GOALKEEPER">
+      <img src="" class="playerImage" id="GOALKEEPER_TEAM_IMAGE">
+      <p class="playerNumber" id="GOALKEEPER_NUMBER"></p>
+      <p class="playerName" id="GOALKEEPER_NAME"></p>
+    </div>
+  </div>
     <!--<div class="sponsor banner1"></div>
     <div class="sponsor banner2"></div>
     <div class="sponsor banner3"></div> -->
@@ -248,7 +259,12 @@
 
   </div>
   <div class="side">
-    <button onclick="action()">Throw Ball</button>
+    <button onclick="action()">Action</button>
+    <button onclick="throwBall()">Throw Goal</button>
+    <button onclick="throwMissedBall()">Throw Missed Ball</button>
+    <button onclick="throwCaughtBall()">Throw Caught Ball</button>
+    <button onclick="toggle()">Toggle GOAL/CAUGHT</button>
+    <p id="toggleNow"></p>
   </div>
 </div>
 </body>
