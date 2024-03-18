@@ -54,7 +54,6 @@ public class MatchActionDTO {
         this.player = player;
     }
 
-
     public Player getOpponentPlayer() {
         return opponentPlayer;
     }
@@ -141,5 +140,15 @@ public class MatchActionDTO {
 
     public void setMatchActionPositionType(MatchActionPositionType matchActionPositionType) {
         this.matchActionPositionType = matchActionPositionType;
+    }
+
+    public String getCssClass() {
+        if (this.team == null) {
+            return "centerContent";
+        } else if (this.team.equals(this.match.getHomeTeam())) {
+            return "leftMarker";
+        } else {
+            return "rightMarker";
+        }
     }
 }

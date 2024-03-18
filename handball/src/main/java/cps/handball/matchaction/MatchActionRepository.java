@@ -8,4 +8,8 @@ import java.util.List;
 public interface MatchActionRepository extends JpaRepository<MatchAction, Long> {
 
     public List<MatchAction> findPlayerActionByMatch(Match match);
+
+    List<MatchAction> findMatchActionByMatchId(Long matchId);
+
+    List<MatchAction> findMatchActionsByMatchIdOrderByMatchTimeDesc(Long matchId);
 }

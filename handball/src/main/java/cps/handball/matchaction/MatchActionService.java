@@ -25,6 +25,7 @@ public class MatchActionService {
         positionToMatchActionPositionTypeMap.put("Venstre back", MatchActionPositionType.LEFT_BACK);
         positionToMatchActionPositionTypeMap.put("Venstre fløj", MatchActionPositionType.LEFT_WING);
         positionToMatchActionPositionTypeMap.put("Gennembrud", MatchActionPositionType.BREAKTHROUGH);
+        positionToMatchActionPositionTypeMap.put("Straffemål", MatchActionPositionType.PENALTY);
         positionToMatchActionPositionTypeMap.put("Kontra 1. bølge", MatchActionPositionType.FIRST_WAVE);
         positionToMatchActionPositionTypeMap.put("Kontra 2. bølge", MatchActionPositionType.SECOND_WAVE);
         positionToMatchActionPositionTypeMap.put("Målvogter", MatchActionPositionType.GOALKEEPER);
@@ -65,7 +66,7 @@ public class MatchActionService {
         matchAction.setMatchActionPositionType(positionToMatchActionPositionTypeMap.get(position));
 
 
-        match.getHomeTeam().getPlayers().stream()
+        attackingTeam.getPlayers().stream()
                 .filter(player -> player.getName().equalsIgnoreCase(playerName))
                 .findFirst()
                 .ifPresent(matchAction::setPlayer);
@@ -99,8 +100,8 @@ public class MatchActionService {
 
 
 
-    public List<MatchActionDTO> getPlayerActionsByMatchID(Match match) {
-        List<MatchAction> matchActions = matchActionRepository.findPlayerActionByMatch(match);
+    public List<MatchActionDTO> findMatchActionsByMatchIdOrderByMatchTimeDesc(Long matchID) {
+        List<MatchAction> matchActions = matchActionRepository.findMatchActionsByMatchIdOrderByMatchTimeDesc(matchID);
         return matchActions.stream().map(playerAction -> new MatchActionDTO(
                 playerAction.getId(),
                 playerAction.getTeam(),

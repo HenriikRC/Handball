@@ -56,6 +56,7 @@ public class LiveMatchScraperTask {
             for(WebElement element : matchBlocks) {
                 parseMatchBlocks(match, element);
             }
+            System.out.println("Parsed all TIME ACTIONS");
             for(WebElement element : homeBlocks) {
                 WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-img.bounce-in.js-time"));
                 String matchTime = timeElement.getText().trim();
@@ -65,24 +66,27 @@ public class LiveMatchScraperTask {
                 switch(eventType.toLowerCase()) {
                     case("mål"):
                         System.out.println("Parsing GOAL HOME");
-                        parseGoal(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(), MatchActionType.GOAL);
+                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(), MatchActionType.GOAL);
                         break;
                     case("straffemål"):
-                        System.out.println("Parsing PENALTY GOAL HOME");
-                        parseGoal(match, element, matchTime, match.getHomeTeam(), match.getAwayTeam(), MatchActionType.PENALTY_GOAL);
+                        System.out.println("Parsing PENALTY_GOAL HOME");
+                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.PENALTY_GOAL);
                         break;
-                    case("straffe forbi"):
-                        System.out.println("Parsing PENALTY MISSED HOME");
-
+                    case("straffe forbi"):;
+                        System.out.println("Parsing PENALTY_MISS HOME");
+                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.PENALTY_MISS);
                         break;
                     case("straffe reddet"):
-
+                        System.out.println("Parsing PENALTY_PENALTY HOME");
+                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.PENALTY_SAVE);
                         break;
                     case("skud forbi"):
-
+                        System.out.println("Parsing MISSED HOME");
+                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.MISSED);
                         break;
                     case("skud reddet"):
-
+                        System.out.println("Parsing SAVED HOME");
+                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.SAVED);
                         break;
                     case("blokeret"):
 
@@ -119,6 +123,7 @@ public class LiveMatchScraperTask {
                         break;
                 }
             }
+            System.out.println("Parsed all HOME ACTIONS");
             for(WebElement element : awayBlocks) {
                 WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-img.bounce-in.js-time"));
                 String matchTime = timeElement.getText().trim();
@@ -128,13 +133,28 @@ public class LiveMatchScraperTask {
                 switch(eventType.toLowerCase()) {
                     case("mål"):
                         System.out.println("Parsing GOAL AWAY");
-                        parseGoal(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(), MatchActionType.GOAL);
+                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(), MatchActionType.GOAL);
                         break;
-                    case("straffemål"):;
+                    case("straffemål"):
+                        System.out.println("Parsing PENALTY_GOAL AWAY");
+                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.PENALTY_GOAL);
+                        break;
                     case("straffe forbi"):;
-                    case("straffe reddet"):;
-                    case("skud forbi"):;
-                    case("skud reddet"):;
+                        System.out.println("Parsing PENALTY_MISS AWAY");
+                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.PENALTY_MISS);
+                        break;
+                    case("straffe reddet"):
+                        System.out.println("Parsing PENALTY_SAVE AWAY");
+                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.PENALTY_SAVE);
+                        break;
+                    case("skud forbi"):
+                        System.out.println("Parsing MISSED AWAY");
+                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.MISSED);
+                        break;
+                    case("skud reddet"):
+                        System.out.println("Parsing SAVED AWAY");
+                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.SAVED);
+                        break;
                     case("blokeret"):;
                     case("fejlaflevering"):;
                     case("skud på stolpe"):;
@@ -148,6 +168,7 @@ public class LiveMatchScraperTask {
                     case("tabt bold"):;
                 }
             }
+            System.out.println("Parsed all AWAY ACTIONS");
 
 
         } catch (InterruptedException e) {
@@ -159,7 +180,7 @@ public class LiveMatchScraperTask {
         }
     }
 
-    private void parseGoal(Match match, WebElement element, String matchTime, Team attackingTeam, Team defendingTeam, MatchActionType matchActionType) {
+    private void parseShot(Match match, WebElement element, String matchTime, Team attackingTeam, Team defendingTeam, MatchActionType matchActionType) {
         String playerName = getMainPlayerName(element);
         String position = getMainPlayerPosition(element);
         String goalkeeperName = getGoalKeeperName(element);
@@ -182,20 +203,33 @@ public class LiveMatchScraperTask {
         return positionRaw.replaceAll("Fra pos\\.\\s+|\\)$", "").trim();
     }
 
-    private String getGoalKeeperName(WebElement element) {
-        String goalkeeperInfo = element.findElements(By.tagName("p")).get(1).getText();
-        return goalkeeperInfo.replaceFirst("^Målvogter: \\d+\\s+", "").trim();
-    }
-
     private String getAssistingPlayerName(WebElement element) {
-        List<WebElement> eventHeaders = element.findElements(By.tagName("h2"));
-        for (WebElement header : eventHeaders) {
-            if (header.getText().equals("Assist")) {
-                WebElement assistInfo = element.findElements(By.tagName("p")).get(eventHeaders.indexOf(header) + 1);
-                return assistInfo.getText().trim().replaceFirst("^\\d+\\.\\s+", "");
+        List<WebElement> allContent = element.findElements(By.xpath(".//*"));
+        boolean assistFound = false;
+
+        for (WebElement content : allContent) {
+            // Check if current element is an "Assist" header
+            if (content.getTagName().equalsIgnoreCase("h2") && content.getText().trim().equalsIgnoreCase("Assist")) {
+                assistFound = true;
+                continue;
+            }
+
+            // If "Assist" header found, next paragraph contains the assisting player's name
+            if (assistFound && content.getTagName().equalsIgnoreCase("p")) {
+                String text = content.getText().trim();
+                // Assuming player name might be prefixed with jersey number (e.g., "12. Matthias DORGELO")
+                return text.replaceFirst("^\\d+\\.\\s+", "");
             }
         }
-        return null;
+
+        return null; // Return null if no assisting player's name is found
+    }
+
+    private String getGoalKeeperName(WebElement element) {
+        // Your existing logic to extract the goalkeeper's name
+        // Consider refining this based on the structure of your HTML if needed
+        String goalkeeperInfo = element.findElements(By.tagName("p")).get(1).getText();
+        return goalkeeperInfo.replaceFirst("^Målvogter:\\s*\\d+\\.\\s+", "");
     }
 
     private void parseMatchBlocks(Match match, WebElement element) {

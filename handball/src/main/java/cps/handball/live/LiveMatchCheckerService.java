@@ -31,14 +31,6 @@ public class LiveMatchCheckerService {
 
     @Scheduled(fixedRate = 300000)
     public void checkForLiveMatches() {
-        /*List<Match> matches = matchService.findUnfinishedMatches();
-        Timestamp now = Timestamp.from(Instant.now());
-
-        List<Match> liveMatches = matches.stream()
-                .filter(match -> match.getMatchTime().before(now) && !match.isFinished())
-                .toList();
-
-         */
         List<Match> liveMatches = new ArrayList<>();
         liveMatches.add(matchService.findMatchById(168L));
         liveMatches.forEach(match -> {

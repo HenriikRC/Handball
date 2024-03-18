@@ -11,8 +11,8 @@ public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
+    private String shortName;
     private int wins;
     private int losses;
     private int ties;
@@ -48,6 +48,15 @@ public class Team {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
     public int getWins() {
         return wins;
     }

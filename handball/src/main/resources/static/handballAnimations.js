@@ -24,6 +24,10 @@ const missedSpotsTop = [
     { top: '5%', left: '90%' }
 ];
 
+const url = window.location.href;
+const matchId = url.split('/').pop();
+console.log("Match ID = " + matchId);
+
 function updatePlayerInfo(playerIdPrefix, playerName, playerNumber, playerImageLink, teamImageLink) {
     const playerTeamImage = document.getElementById(`${playerIdPrefix}_TEAM_IMAGE`);
     const playerNumberEl = document.getElementById(`${playerIdPrefix}_NUMBER`);

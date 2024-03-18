@@ -22,14 +22,6 @@ public class RouteController {
         return convertToString("matchOverview");
     }
 
-    @GetMapping("/live/match/{matchId}")
-    @ResponseBody
-    public String liveMatchPage(@PathVariable("matchId") Long matchId) throws IOException{
-        System.out.println(matchId);
-        return convertToString("liveMatch");
-    }
-
-
     public String convertToString(String htmlString) throws IOException {
         Resource resource = new ClassPathResource("public/" + htmlString + ".html");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(),

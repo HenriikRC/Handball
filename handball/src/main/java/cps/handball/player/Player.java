@@ -21,7 +21,6 @@ public class Player {
     private int totalRescues;
     private double totalMep;
     private PositionType positionType;
-
     private String playerImageLink;
 
     @ManyToOne

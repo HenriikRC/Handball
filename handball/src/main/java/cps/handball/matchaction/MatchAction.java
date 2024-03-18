@@ -25,7 +25,9 @@ public class MatchAction {
     @ManyToOne
     private Match match;
     private String matchTime;
+    @Enumerated(EnumType.STRING)
     private MatchActionType matchActionType;
+    @Enumerated(EnumType.STRING)
     private MatchActionPositionType matchActionPositionType;
     private double mepRatingChange;
 
@@ -56,7 +58,6 @@ public class MatchAction {
     public Match getMatch() {
         return match;
     }
-
     public void setMatch(Match match) {
         this.match = match;
     }

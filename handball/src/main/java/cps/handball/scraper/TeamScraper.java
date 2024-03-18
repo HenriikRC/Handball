@@ -27,21 +27,28 @@ public class TeamScraper {
             Elements teamLinks = overviewDoc.select(".league-team__team a");
 
             for (Element teamLink : teamLinks) {
+                Elements teamShortNameElements = overviewDoc.select(".league-team__team__short-name");
+                String teamShortName = "";
+                for(Element teamShortNameElement : teamShortNameElements) {
+                    teamShortName = teamShortNameElement.text();
+                    teamShortName = teamShortName.replace("#", "");
+                }
                 String teamPageUrl = teamLink.attr("abs:href");
-                scrapeTeam(teamPageUrl);
+                scrapeTeam(teamPageUrl, teamShortName);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void scrapeTeam(String teamPageUrl) {
+    private void scrapeTeam(String teamPageUrl, String teamShortName) {
         try {
             System.out.println("Accessing URL: " + teamPageUrl);
             Document teamPageDoc = Jsoup.connect(teamPageUrl).get();
 
             Team team = new Team();
             team.setName(teamPageDoc.title());
+            team.setShortName(teamShortName);
             teamService.save(team);
             String teamPageLink = teamPageDoc.select("a.ls-team__info__ul__li__link[href*='/tophaandbold_theme/teams/view']").attr("abs:href");
             if (!teamPageLink.isEmpty()) {
