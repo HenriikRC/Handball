@@ -8,6 +8,17 @@ public class MatchDTO {
     private int homeTeamGoals;
     private int awayTeamGoals;
     private String playerAnalysisLink;
+    private String matchSiteLink;
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
+
+    private boolean isFinished;
 
     public String getMatchSiteLink() {
         return matchSiteLink;
@@ -17,13 +28,11 @@ public class MatchDTO {
         this.matchSiteLink = matchSiteLink;
     }
 
-    private String matchSiteLink;
-
 
     public MatchDTO() {
     }
 
-    public MatchDTO(Long id, String matchTime, String homeTeamName, String awayTeamName, int homeTeamGoals, int awayTeamGoals, String playerAnalysisLink, String matchSiteLink) {
+    public MatchDTO(Long id, String matchTime, String homeTeamName, String awayTeamName, int homeTeamGoals, int awayTeamGoals, String playerAnalysisLink, String matchSiteLink, boolean isFinished) {
         this.id = id;
         this.matchTime = matchTime;
         this.homeTeamName = homeTeamName;
@@ -32,6 +41,7 @@ public class MatchDTO {
         this.awayTeamGoals = awayTeamGoals;
         this.playerAnalysisLink = playerAnalysisLink;
         this.matchSiteLink = matchSiteLink;
+        this.isFinished = isFinished;
     }
 
     public Long getId() {

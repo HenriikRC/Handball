@@ -4,7 +4,6 @@ import cps.handball.match.Match;
 import cps.handball.matchaction.MatchAction;
 import cps.handball.matchaction.MatchActionService;
 import cps.handball.matchaction.MatchActionType;
-import cps.handball.player.PlayerService;
 import cps.handball.team.Team;
 import jakarta.transaction.Transactional;
 import org.openqa.selenium.By;
@@ -24,152 +23,52 @@ public class LiveMatchScraperTask {
 
     private final TaskScheduler taskScheduler;
     private final MatchActionService matchActionService;
-    private final PlayerService playerService;
+    private final MatchActionEventPublisher eventPublisher;
     private ScheduledFuture<?> futureTask;
 
-    public LiveMatchScraperTask(TaskScheduler taskScheduler, MatchActionService matchActionService, PlayerService playerService) {
+    public LiveMatchScraperTask(TaskScheduler taskScheduler,
+                                MatchActionService matchActionService,
+                                MatchActionEventPublisher eventPublisher) {
         this.taskScheduler = taskScheduler;
         this.matchActionService = matchActionService;
-        this.playerService = playerService;
+        this.eventPublisher = eventPublisher;
     }
 
 
 
     @Transactional
     public void startScraping(Match match) {
-        //futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/10 * * * * *"));
+        futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/10 * * * * *"));
     }
 
     private void scrapeMatch(Match match) {
+
         System.out.println("Scraping match data from: " + match.getMatchSiteLink());
-
         WebDriver driver = initSelenium();
-
         try {
-            driver.get(match.getMatchSiteLink());
+            String matchSiteLink = match.getMatchSiteLink();
+            if (matchSiteLink == null || matchSiteLink.isEmpty()) {
+                System.out.println("Match site link is null or empty for match: " + match.toString());
+                return;
+            }
+            driver.get(matchSiteLink);
             Thread.sleep(2000);
 
             List<WebElement> matchBlocks = driver.findElements(By.cssSelector(".cd-timeline-block-center"));
-            List<WebElement> homeBlocks = driver.findElements(By.cssSelector(".cd-timeline-block.left"));
-            List<WebElement> awayBlocks = driver.findElements(By.cssSelector(".cd-timeline-block.right"));
-
-            for(WebElement element : matchBlocks) {
-                parseMatchBlocks(match, element);
+            for (WebElement element : matchBlocks) {
+                WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-center-img"));
+                String matchTime = timeElement.getText().trim();
+                System.out.println("Found " + matchBlocks.size() + " match blocks.");
+                matchBlocks.forEach(block -> System.out.println(block.getText()));
+                MatchActionType matchActionType = determineMatchActionTypeFromBlock(element);
+                if (matchActionType != null && !matchActionService.checkIfExists(match.getId(), matchTime, matchActionType)) {
+                    parseMatchBlocks(match, element);
+                }
             }
             System.out.println("Parsed all TIME ACTIONS");
-            for(WebElement element : homeBlocks) {
-                WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-img.bounce-in.js-time"));
-                String matchTime = timeElement.getText().trim();
 
-                WebElement eventTypeElement = element.findElement(By.tagName("h2"));
-                String eventType = eventTypeElement.getText();
-                switch(eventType.toLowerCase()) {
-                    case("mål"):
-                        System.out.println("Parsing GOAL HOME");
-                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(), MatchActionType.GOAL);
-                        break;
-                    case("straffemål"):
-                        System.out.println("Parsing PENALTY_GOAL HOME");
-                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.PENALTY_GOAL);
-                        break;
-                    case("straffe forbi"):;
-                        System.out.println("Parsing PENALTY_MISS HOME");
-                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.PENALTY_MISS);
-                        break;
-                    case("straffe reddet"):
-                        System.out.println("Parsing PENALTY_PENALTY HOME");
-                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.PENALTY_SAVE);
-                        break;
-                    case("skud forbi"):
-                        System.out.println("Parsing MISSED HOME");
-                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.MISSED);
-                        break;
-                    case("skud reddet"):
-                        System.out.println("Parsing SAVED HOME");
-                        parseShot(match, element, matchTime, match.getHomeTeam(),match.getAwayTeam(),MatchActionType.SAVED);
-                        break;
-                    case("blokeret"):
-
-                        break;
-                    case("fejlaflevering"):
-
-                        break;
-                    case("skud på stolpe"):
-
-                        break;
-                    case("advarsel"):
-
-                        break;
-                    case("rødt kort"):
-
-                        break;
-                    case("rødt kort 3 x 2 min."):
-
-                        break;
-                    case("blåt kort"):
-
-                        break;
-                    case("udvisning"):
-
-                        break;
-                    case("passisvt spil"):
-
-                        break;
-                    case("team timeout"):
-
-                        break;
-                    case("tabt bold"):
-
-                        break;
-                }
-            }
-            System.out.println("Parsed all HOME ACTIONS");
-            for(WebElement element : awayBlocks) {
-                WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-img.bounce-in.js-time"));
-                String matchTime = timeElement.getText().trim();
-
-                WebElement eventTypeElement = element.findElement(By.tagName("h2"));
-                String eventType = eventTypeElement.getText();
-                switch(eventType.toLowerCase()) {
-                    case("mål"):
-                        System.out.println("Parsing GOAL AWAY");
-                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(), MatchActionType.GOAL);
-                        break;
-                    case("straffemål"):
-                        System.out.println("Parsing PENALTY_GOAL AWAY");
-                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.PENALTY_GOAL);
-                        break;
-                    case("straffe forbi"):;
-                        System.out.println("Parsing PENALTY_MISS AWAY");
-                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.PENALTY_MISS);
-                        break;
-                    case("straffe reddet"):
-                        System.out.println("Parsing PENALTY_SAVE AWAY");
-                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.PENALTY_SAVE);
-                        break;
-                    case("skud forbi"):
-                        System.out.println("Parsing MISSED AWAY");
-                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.MISSED);
-                        break;
-                    case("skud reddet"):
-                        System.out.println("Parsing SAVED AWAY");
-                        parseShot(match, element, matchTime, match.getAwayTeam(),match.getHomeTeam(),MatchActionType.SAVED);
-                        break;
-                    case("blokeret"):;
-                    case("fejlaflevering"):;
-                    case("skud på stolpe"):;
-                    case("advarsel"):;
-                    case("rødt kort"):;
-                    case("rødt kort 3 x 2 min."):;
-                    case("blåt kort"):;
-                    case("udvisning"):;
-                    case("passisvt spil"):;
-                    case("team timeout"):;
-                    case("tabt bold"):;
-                }
-            }
-            System.out.println("Parsed all AWAY ACTIONS");
-
+            processMatchActions(driver, match, true); // for home team
+            processMatchActions(driver, match, false); // for away team
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -180,6 +79,27 @@ public class LiveMatchScraperTask {
         }
     }
 
+    private void processMatchActions(WebDriver driver, Match match, boolean isHomeTeam) {
+        List<WebElement> blocks = driver.findElements(By.cssSelector(isHomeTeam ? ".cd-timeline-block.left" : ".cd-timeline-block.right"));
+        for (WebElement element : blocks) {
+            WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-img.bounce-in.js-time"));
+            String matchTime = timeElement.getText().trim();
+            WebElement eventTypeElement = element.findElement(By.tagName("h2"));
+            String eventType = eventTypeElement.getText().trim();
+            MatchActionType matchActionType = determineMatchActionType(eventType);
+
+            if (matchActionType != null && !matchActionService.checkIfExists(match.getId(), matchTime, matchActionType)) {
+                parseShot(match, element, matchTime,
+                        isHomeTeam ? match.getHomeTeam() : match.getAwayTeam(),
+                        isHomeTeam ? match.getAwayTeam() : match.getHomeTeam(),
+                        matchActionType);
+            }
+        }
+        System.out.println("Parsed all " + (isHomeTeam ? "HOME" : "AWAY") + " ACTIONS");
+    }
+
+
+
     private void parseShot(Match match, WebElement element, String matchTime, Team attackingTeam, Team defendingTeam, MatchActionType matchActionType) {
         String playerName = getMainPlayerName(element);
         String position = getMainPlayerPosition(element);
@@ -188,6 +108,48 @@ public class LiveMatchScraperTask {
 
         matchActionService.save(match, matchTime, attackingTeam, position,
                 playerName, matchActionType, assistingPlayerName, defendingTeam, goalkeeperName);
+    }
+
+
+    private MatchActionType determineMatchActionType(String eventType) {
+        switch(eventType.toLowerCase()) {
+            case("mål"):
+                return MatchActionType.GOAL;
+            case("straffemål"):
+                return MatchActionType.PENALTY_GOAL;
+            case("straffe forbi"):;
+                return MatchActionType.PENALTY_MISS;
+            case("straffe reddet"):
+                return MatchActionType.PENALTY_SAVE;
+            case("skud forbi"):
+                return MatchActionType.MISSED;
+            case("skud reddet"):
+                return MatchActionType.SAVED;
+            case("blokeret"):
+                return null;
+            case("fejlaflevering"):
+                return null;
+            case("skud på stolpe"):
+                return null;
+            case("advarsel"):
+                return null;
+            case("rødt kort"):
+                return null;
+            case("rødt kort 3 x 2 min."):
+                return null;
+            case("blåt kort"):
+                return null;
+            case("udvisning"):
+                return null;
+            case("passisvt spil"):
+                return null;
+            case("team timeout"):
+                return null;
+            case("tabt bold"):
+                return null;
+            default:
+                return null;
+        }
     }
 
     private String getMainPlayerName(WebElement element) {
@@ -208,30 +170,36 @@ public class LiveMatchScraperTask {
         boolean assistFound = false;
 
         for (WebElement content : allContent) {
-            // Check if current element is an "Assist" header
             if (content.getTagName().equalsIgnoreCase("h2") && content.getText().trim().equalsIgnoreCase("Assist")) {
                 assistFound = true;
                 continue;
             }
 
-            // If "Assist" header found, next paragraph contains the assisting player's name
             if (assistFound && content.getTagName().equalsIgnoreCase("p")) {
                 String text = content.getText().trim();
-                // Assuming player name might be prefixed with jersey number (e.g., "12. Matthias DORGELO")
                 return text.replaceFirst("^\\d+\\.\\s+", "");
             }
         }
 
-        return null; // Return null if no assisting player's name is found
+        return null;
     }
 
     private String getGoalKeeperName(WebElement element) {
-        // Your existing logic to extract the goalkeeper's name
-        // Consider refining this based on the structure of your HTML if needed
         String goalkeeperInfo = element.findElements(By.tagName("p")).get(1).getText();
         return goalkeeperInfo.replaceFirst("^Målvogter:\\s*\\d+\\.\\s+", "");
     }
 
+    private MatchActionType determineMatchActionTypeFromBlock(WebElement element) {
+        String text = element.getText().toUpperCase();
+        switch (text) {
+            case "KAMP START": return MatchActionType.START;
+            case "PAUSE": return MatchActionType.PAUSE;
+            case("PAUSE SLUT"):return MatchActionType.PAUSE_END;
+            case("FULDTID"):return MatchActionType.FULL_TIME;
+            case("KAMP SLUT"):return MatchActionType.END;
+            default: return null;
+        }
+    }
     private void parseMatchBlocks(Match match, WebElement element) {
         MatchAction matchAction = new MatchAction();
 

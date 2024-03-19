@@ -1,6 +1,7 @@
 package cps.handball.live;
 
 import cps.handball.match.Match;
+import cps.handball.match.MatchDTO;
 import cps.handball.match.MatchService;
 import cps.handball.live.LiveMatchScraperTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 @EnableScheduling
@@ -31,26 +31,37 @@ public class LiveMatchCheckerService {
 
     @Scheduled(fixedRate = 300000)
     public void checkForLiveMatches() {
-        List<Match> liveMatches = new ArrayList<>();
-        liveMatches.add(matchService.findMatchById(168L));
-        liveMatches.forEach(match -> {
-            if (!activeScrapers.containsKey(match.getId())) {
-                LiveMatchScraperTask newTask = context.getBean(LiveMatchScraperTask.class);
-                newTask.startScraping(match);
-                activeScrapers.put(match.getId(), newTask);
-                System.out.println("Match is live: " + match.getId());
+        List<Match> unfinishedMatches = matchService.findUnfinishedMatches();
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        unfinishedMatches.forEach(match -> {
+            Timestamp matchTimestamp = match.getMatchTime();
+
+
+            LocalDateTime matchTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(matchTimestamp.getTime()), ZoneId.systemDefault());
+
+            if (currentTime.plusMinutes(5).plusSeconds(30).isAfter(matchTime)) {
+                if (!activeScrapers.containsKey(match.getId())) {
+                    LiveMatchScraperTask newTask = context.getBean(LiveMatchScraperTask.class);
+                    newTask.startScraping(match);
+                    activeScrapers.put(match.getId(), newTask);
+                    System.out.println("Match is live: " + match.getId());
+                }
             }
         });
-
-        stopFinishedMatches();
     }
 
     private void stopFinishedMatches() {
         activeScrapers.entrySet().removeIf(entry -> {
-            Match match = matchService.findMatchById(entry.getKey());
-            if (match.isFinished()) {
-                entry.getValue().stopScraping();
-                return true;
+            Optional<MatchDTO> matchOptional = matchService.getMatchById(entry.getKey());
+
+            if (matchOptional.isPresent()) {
+                MatchDTO match = matchOptional.get();
+
+                if (match.isFinished()) {
+                    entry.getValue().stopScraping();
+                    return true;
+                }
             }
             return false;
         });

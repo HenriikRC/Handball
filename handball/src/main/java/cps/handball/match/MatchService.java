@@ -5,24 +5,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class MatchService {
 
     private final MatchRepository matchRepository;
+    private final MatchMapper matchMapper;
 
     @Autowired
-    public MatchService(MatchRepository matchRepository) {
+    public MatchService(MatchRepository matchRepository,
+                        MatchMapper matchMapper) {
         this.matchRepository = matchRepository;
+        this.matchMapper = matchMapper;
     }
 
     @Transactional
     public void saveMatch(Match match) {
         matchRepository.save(match);
     }
-
-    public List<MatchDTO> getAllMatchDTOs() {
+    @Transactional
+    public List<MatchDTO> getAllMatches() {
         List<Match> matches = matchRepository.findAll();
         return matches.stream().map(match -> new MatchDTO(
                 match.getId(),
@@ -32,15 +36,18 @@ public class MatchService {
                 match.getHomeTeamGoals(),
                 match.getAwayTeamGoals(),
                 match.getPlayerAnalysisLink(),
-                match.getMatchSiteLink()
+                match.getMatchSiteLink(),
+                match.isFinished()
         )).collect(Collectors.toList());
     }
-
+    @Transactional
     public List<Match> findUnfinishedMatches() {
         return matchRepository.findByisFinishedFalse();
     }
-
-    public Match findMatchById(Long id) {
-        return matchRepository.findMatchById(id);
+    @Transactional
+    public Optional<MatchDTO> getMatchById(Long id) {
+        Optional<Match> matchOptional = matchRepository.findMatchById(id);
+        return matchOptional.map(matchMapper::toDTO);
     }
+
 }

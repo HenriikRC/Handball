@@ -1,7 +1,6 @@
 package cps.handball.matchaction;
 
 import cps.handball.match.Match;
-import cps.handball.player.Player;
 import cps.handball.team.Team;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -9,12 +8,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class MatchActionService {
 
     private final MatchActionRepository matchActionRepository;
+    private final MatchActionMapper matchActionMapper;
     private HashMap<String, MatchActionPositionType> positionToMatchActionPositionTypeMap = new HashMap<>();
     @PostConstruct
     public void initializeMap() {
@@ -31,31 +31,14 @@ public class MatchActionService {
         positionToMatchActionPositionTypeMap.put("Målvogter", MatchActionPositionType.GOALKEEPER);
     }
 
-
-    public MatchActionService(MatchActionRepository matchActionRepository) {
+    public MatchActionService(MatchActionRepository matchActionRepository,
+                              MatchActionMapper matchActionMapper) {
         this.matchActionRepository = matchActionRepository;
-    }
-
-    public MatchAction recordPlayerAction(Team team, Player player, Player assistingPlayer,
-                                          Team opponentTeam, Player goalKeeper, Player opponentPlayer,
-                                          Match match, String matchTime,
-                                          MatchActionType matchActionType, double mepRatingChange) {
-        MatchAction matchAction = new MatchAction();
-        matchAction.setTeam(team);
-        matchAction.setPlayer(player);
-        matchAction.setAssistingPlayer(assistingPlayer);
-        matchAction.setOpponentTeam(opponentTeam);
-        matchAction.setGoalKeeper(goalKeeper);
-        matchAction.setOpponentPlayer(opponentPlayer);
-        matchAction.setMatch(match);
-        matchAction.setMatchTime(matchTime);
-        matchAction.setActionType(matchActionType);
-        matchAction.setMepRatingChange(mepRatingChange);
-        return matchActionRepository.save(matchAction);
+        this.matchActionMapper = matchActionMapper;
     }
 
     @Transactional
-    public void save(Match match, String matchTime, Team attackingTeam, String position,
+    public MatchAction save(Match match, String matchTime, Team attackingTeam, String position,
                      String playerName, MatchActionType matchActionType, String assistingPlayerName,
                      Team defendingTeam, String goalkeeperName) {
         MatchAction matchAction = new MatchAction();
@@ -65,16 +48,14 @@ public class MatchActionService {
         matchAction.setTeam(attackingTeam);
         matchAction.setMatchActionPositionType(positionToMatchActionPositionTypeMap.get(position));
 
-
         attackingTeam.getPlayers().stream()
-                .filter(player -> player.getName().equalsIgnoreCase(playerName))
+                .filter(player -> player.getName().toLowerCase().contains(playerName.toLowerCase()))
                 .findFirst()
                 .ifPresent(matchAction::setPlayer);
 
-
         if (assistingPlayerName != null) {
             attackingTeam.getPlayers().stream()
-                    .filter(player -> player.getName().equalsIgnoreCase(assistingPlayerName))
+                    .filter(player -> player.getName().toLowerCase().contains(assistingPlayerName.toLowerCase()))
                     .findFirst()
                     .ifPresent(matchAction::setAssistingPlayer);
         }
@@ -86,40 +67,30 @@ public class MatchActionService {
                 .findFirst()
                 .ifPresent(matchAction::setGoalKeeper);
 
-        save(matchAction);
+        return save(matchAction);
     }
 
-    public MatchAction recordMatchAction(Match match, String matchTime,
-                                         MatchActionType matchActionType){
-        MatchAction matchAction = new MatchAction();
-        matchAction.setMatch(match);
-        matchAction.setMatchTime(matchTime);
-        matchAction.setMatchActionType(matchActionType);
-        return matchActionRepository.save(matchAction);
+    public List<MatchActionDTO> findAllMatchActions() {
+        List<MatchAction> allMatchActions = matchActionRepository.findAll();
+        return matchActionMapper.toDTO(allMatchActions);
     }
-
-
 
     public List<MatchActionDTO> findMatchActionsByMatchIdOrderByMatchTimeDesc(Long matchID) {
         List<MatchAction> matchActions = matchActionRepository.findMatchActionsByMatchIdOrderByMatchTimeDesc(matchID);
-        return matchActions.stream().map(playerAction -> new MatchActionDTO(
-                playerAction.getId(),
-                playerAction.getTeam(),
-                playerAction.getPlayer(),
-                playerAction.getAssistingPlayer(),
-                playerAction.getOpponentTeam(),
-                playerAction.getGoalKeeper(),
-                playerAction.getOpponentPlayer(),
-                playerAction.getMatch(),
-                playerAction.getMatchTime(),
-                playerAction.getActionType(),
-                playerAction.getMatchActionPositionType(),
-                playerAction.getMepRatingChange()
-        )).collect(Collectors.toList());
+        return matchActionMapper.toDTO(matchActions);
     }
 
     @Transactional
-    public void save(MatchAction action) {
-        matchActionRepository.save(action);
+    public MatchAction save(MatchAction action) {
+        return matchActionRepository.save(action);
     }
+
+    public boolean checkIfExists(Long matchId, String matchTime, MatchActionType matchActionType) {
+        return matchActionRepository.existsByMatchIdAndMatchTimeAndMatchActionType(matchId, matchTime, matchActionType);
+    }
+
+    public boolean checkIfMatchActionTypeExistsForMatchId(Long matchId, MatchActionType matchActionType) {
+        return matchActionRepository.existsByMatchIdAndMatchActionType(matchId, matchActionType);
+    }
+
 }

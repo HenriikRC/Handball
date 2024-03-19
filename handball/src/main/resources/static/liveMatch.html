@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="da">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Match</title>
   <script defer src="/handballAnimations.js"></script>
+  <script defer src="/liveMatchPreviousActionsFetch.js"></script>
   <style>
     .container {
       display: flex;
@@ -340,31 +341,7 @@
   </div>
   <div class="side right">
     <h2>Match Actions</h2>
-    <div th:if="${not #lists.isEmpty(matchActions)}">
-      <ul>
-        <li th:each="action : ${matchActions}"
-            th:classappend="${action.cssClass}"
-            class="matchEvent">
-          <div class="matchEventLine">
-            <span class="matchEventLine action" th:text="${action.matchActionType}"></span>
-          </div>
-          <div class="matchEventLine">
-            <div th:if="${action.player != null}">
-              <span><span th:text="${action.team.shortName} "></span>Player: <span th:text="${action.player.name}"></span></span><br>
-            </div>
-          </div>
-          <div class="matchEventLine">
-            <div th:if="${action.goalKeeper != null}">
-              <span>Keeper: <span th:text="${action.goalKeeper.name}"></span></span><br>
-            </div>
-          </div>
-          <!-- Add other details here -->
-        </li>
-      </ul>
-    </div>
-    <div th:if="${#lists.isEmpty(matchActions)}">
-      <p>The match has not begun</p>
-    </div>
+    <div id="matchActionsContainer"></div>
   </div>
 </div>
 </body>

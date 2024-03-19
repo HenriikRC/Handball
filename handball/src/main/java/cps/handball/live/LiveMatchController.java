@@ -1,35 +1,41 @@
 package cps.handball.live;
 
-import cps.handball.matchaction.MatchActionDTO;
-import cps.handball.matchaction.MatchActionService;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
+import jakarta.persistence.Tuple;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-@Controller
 public class LiveMatchController {
+    private final ConcurrentMap<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    private final MatchActionService matchActionService;
-
-    public LiveMatchController(MatchActionService matchActionService) {
-        this.matchActionService = matchActionService;
+    @GetMapping(value = "/api/v1/live/matchactions/{matchId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamMatchActions(@PathVariable Long matchId) {
+        SseEmitter emitter = new SseEmitter();
+        emitters.put(matchId, emitter);
+        emitter.onCompletion(() -> emitters.remove(matchId, emitter));
+        emitter.onTimeout(() -> emitters.remove(matchId, emitter));
+        return emitter;
     }
 
-    @GetMapping("/live/match/{matchId}")
-    public String liveMatchPage(@PathVariable("matchId") Long matchId, Model model) {
-        System.out.println(matchId);
-        List<MatchActionDTO> playerActions = matchActionService.findMatchActionsByMatchIdOrderByMatchTimeDesc(matchId);
-        model.addAttribute("matchActions", playerActions);
-        return "liveMatch";
+    @EventListener
+    public void onMatchActionEvent(MatchActionEvent event) {
+        Long matchId = event.getMatchId();
+        Object matchAction = event.getMatchAction();
+
+        SseEmitter emitter = emitters.get(matchId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().data(matchAction));
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        }
     }
+
 }

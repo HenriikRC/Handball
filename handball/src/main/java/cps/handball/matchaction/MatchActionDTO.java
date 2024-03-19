@@ -1,27 +1,35 @@
 package cps.handball.matchaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import cps.handball.match.Match;
+import cps.handball.match.MatchDTO;
 import cps.handball.player.Player;
+import cps.handball.player.PlayerDTO;
 import cps.handball.team.Team;
+import cps.handball.team.TeamDTO;
 
 public class MatchActionDTO {
 
     private Long id;
-    private Team team;
-    private Player player;
-    private Player assistingPlayer;
-    private Team opponentTeam;
-    private Player goalKeeper;
-    private Player opponentPlayer;
-    private Match match;
+    private TeamDTO team;
+    private PlayerDTO player;
+    private PlayerDTO assistingPlayer;
+    private TeamDTO opponentTeam;
+    private PlayerDTO goalKeeper;
+    private PlayerDTO opponentPlayer;
+    private MatchDTO match;
     private String matchTime;
     private MatchActionType matchActionType;
     private MatchActionPositionType matchActionPositionType;
     private double mepRatingChange;
 
-    public MatchActionDTO(Long id, Team team, Player player, Player assistingPlayer,
-                          Team opponentTeam, Player goalKeeper, Player opponentPlayer,
-                          Match match, String matchTime,
+    public MatchActionDTO() {
+
+    }
+
+    public MatchActionDTO(Long id, TeamDTO team, PlayerDTO player, PlayerDTO assistingPlayer,
+                          TeamDTO opponentTeam, PlayerDTO goalKeeper, PlayerDTO opponentPlayer,
+                          MatchDTO match, String matchTime,
                           MatchActionType matchActionType, MatchActionPositionType matchActionPositionType,
                           double mepRatingChange) {
         this.id = id;
@@ -46,27 +54,59 @@ public class MatchActionDTO {
         this.id = id;
     }
 
-    public Player getPlayer() {
+    public TeamDTO getTeam() {
+        return team;
+    }
+
+    public void setTeam(TeamDTO team) {
+        this.team = team;
+    }
+
+    public PlayerDTO getPlayer() {
         return player;
     }
 
-    public void setPlayer(Player player) {
+    public void setPlayer(PlayerDTO player) {
         this.player = player;
     }
 
-    public Player getOpponentPlayer() {
+    public PlayerDTO getAssistingPlayer() {
+        return assistingPlayer;
+    }
+
+    public void setAssistingPlayer(PlayerDTO assistingPlayer) {
+        this.assistingPlayer = assistingPlayer;
+    }
+
+    public TeamDTO getOpponentTeam() {
+        return opponentTeam;
+    }
+
+    public void setOpponentTeam(TeamDTO opponentTeam) {
+        this.opponentTeam = opponentTeam;
+    }
+
+    public PlayerDTO getGoalKeeper() {
+        return goalKeeper;
+    }
+
+    public void setGoalKeeper(PlayerDTO goalKeeper) {
+        this.goalKeeper = goalKeeper;
+    }
+
+    public PlayerDTO getOpponentPlayer() {
         return opponentPlayer;
     }
 
-    public void setOpponentPlayer(Player opponentPlayer) {
+    public void setOpponentPlayer(PlayerDTO opponentPlayer) {
         this.opponentPlayer = opponentPlayer;
     }
 
-    public Match getMatch() {
+    public MatchDTO getMatch() {
         return match;
     }
 
-    public void setMatch(Match match) {
+    public void setMatch(MatchDTO match) {
         this.match = match;
     }
 
@@ -78,60 +118,12 @@ public class MatchActionDTO {
         this.matchTime = matchTime;
     }
 
-    public MatchActionType getActionType() {
-        return matchActionType;
-    }
-
-    public void setActionType(MatchActionType matchActionType) {
-        this.matchActionType = matchActionType;
-    }
-
-    public double getMepRatingChange() {
-        return mepRatingChange;
-    }
-
-    public void setMepRatingChange(double mepRatingChange) {
-        this.mepRatingChange = mepRatingChange;
-    }
-
-    public Player getAssistingPlayer() {
-        return assistingPlayer;
-    }
-
-    public void setAssistingPlayer(Player assistingPlayer) {
-        this.assistingPlayer = assistingPlayer;
-    }
-
-    public Player getGoalKeeper() {
-        return goalKeeper;
-    }
-
-    public void setGoalKeeper(Player goalKeeper) {
-        this.goalKeeper = goalKeeper;
-    }
-
     public MatchActionType getMatchActionType() {
         return matchActionType;
     }
 
     public void setMatchActionType(MatchActionType matchActionType) {
         this.matchActionType = matchActionType;
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
-    public Team getOpponentTeam() {
-        return opponentTeam;
-    }
-
-    public void setOpponentTeam(Team opponentTeam) {
-        this.opponentTeam = opponentTeam;
     }
 
     public MatchActionPositionType getMatchActionPositionType() {
@@ -142,13 +134,11 @@ public class MatchActionDTO {
         this.matchActionPositionType = matchActionPositionType;
     }
 
-    public String getCssClass() {
-        if (this.team == null) {
-            return "centerContent";
-        } else if (this.team.equals(this.match.getHomeTeam())) {
-            return "leftMarker";
-        } else {
-            return "rightMarker";
-        }
+    public double getMepRatingChange() {
+        return mepRatingChange;
+    }
+
+    public void setMepRatingChange(double mepRatingChange) {
+        this.mepRatingChange = mepRatingChange;
     }
 }
