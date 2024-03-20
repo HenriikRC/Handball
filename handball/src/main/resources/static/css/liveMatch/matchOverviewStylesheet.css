@@ -85,10 +85,9 @@ li::marker {
     font-weight: bold;
 }
 
-
 .field {
-    width: 40vw;
-    height: 80vh;
+    height: 80%;
+    aspect-ratio: 85 / 80;
     background-color: #dbcdf4;
     position: relative;
     border-color: black;
@@ -105,16 +104,19 @@ li::marker {
     border-width: medium;
 }
 .goal.top, .goal.bottom {
-    left: 50%;
-    transform: translateX(-50%);
     background-color:lightgrey;
     border-color:black;
 }
+
 .goal.top {
-    top: -6.4vh;
+    margin: 0 50%;
+    top: 0%;
+    transform: translate(-50%, -100%);
 }
 .goal.bottom {
-    bottom: -6.4vh;
+    margin: 0 50%;
+    top: 100%;
+    transform: translate(-50%, 0%);
 }
 .goal.field.top, .goal.field.bottom {
     height: 15vh;
@@ -125,12 +127,14 @@ li::marker {
     border-width: medium;
 }
 .goal.field.top {
-    top: 9.4%;
-    transform: translate(-50%, -50%) rotate(180deg);
+    margin: 0 50%;
+    top: 0%;
+    transform: translate(-50%, -2%) rotate(180deg);
 }
 .goal.field.bottom {
-    bottom: -10%;
-    transform: translate(-50%, -50%);
+    margin: 0 50%;
+    bottom: 0%;
+    transform: translate(-50%, -97.5%);
 }
 .midline {
     width: 100%;
@@ -145,12 +149,13 @@ li::marker {
     height: 15%;
     border-radius:50%;
     position: absolute;
-    top: 42.5%;
-    left: 42.5%;
     background-color: lightgrey;
     border-color:black;
     border-style: solid;
     border-width: medium;
+    margin: 0 50%;
+    bottom: 50%;
+    transform: translate(-50%,50%)
 }
 
 .player {
