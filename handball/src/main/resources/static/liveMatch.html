@@ -4,252 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Match</title>
+  <link rel="stylesheet" href="css/liveMatch/matchOverviewStylesheet.css">
+  <link rel="stylesheet" href="css/liveMatch/player.css">
   <script defer src="/handballAnimations.js"></script>
-  <!--<script defer src="/liveMatchPreviousActionsFetch.js"></script>-->
   <script defer src="/liveMatchActionSSE.js"></script>
-  <style>
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .side {
-      width: 20%;
-      height: 80%;
-      background-color: #f0f0f0;
-    }
-    .side.right {
-      overflow-y: hidden;
-      border: 1px solid black;
-      margin-left: 10px;
-      scrollbar-gutter: stable both-edges;
-    }
-
-    .side.right:hover,
-    .side.right:active,
-    .side.right:focus {
-      overflow-y: scroll;
-    }
-
-    .side.right::-webkit-scrollbar {
-      width: 0.5em;
-    }
-
-    .side.right::-webkit-scrollbar-track {
-      background-color: hsl(250 15% 93%);
-    }
-
-    .side.right::-webkit-scrollbar-thumb {
-      background-color: hsl(250 15% 60%);
-    }
-
-    .side.right::-webkit-scrollbar-thumb:hover {
-      background-color: hsl(250 15% 27%);
-    }
-
-    .side.right ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 2px;
-    }
-
-    li::marker {
-      display: none;
-    }
-
-
-    .matchEvent {
-      background-color: #f2f2f2;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      position: relative;
-      border: 5px solid transparent;
-    }
-
-    .leftMarker {
-      border-left-color: red;
-    }
-
-    .rightMarker {
-      border-right-color: green;
-    }
-
-    .centerContent {
-      text-align: center;
-      border-right-color: black;
-      border-left-color: black;
-    }
-
-    .matchEvent br + br {
-      display: none;
-    }
-
-    .matchEventLine {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .matchEventLine.action{
-      font-weight: bold;
-    }
-
-
-    .field {
-      width: 40vw;
-      height: 80vh;
-      background-color: #dbcdf4;
-      position: relative;
-      border-color: black;
-      border-style:solid;
-      border-width: medium;
-    }
-    .goal {
-      width: 20vh;
-      height: 6vh;
-      background-color: #fff;
-      position: absolute;
-      border-color:black;
-      border-style: solid;
-      border-width: medium;
-    }
-    .goal.top, .goal.bottom {
-      left: 50%;
-      transform: translateX(-50%);
-      background-color:lightgrey;
-      border-color:black;
-    }
-    .goal.top {
-      top: -6.4vh;
-    }
-    .goal.bottom {
-      bottom: -6.4vh;
-    }
-    .goal.field.top, .goal.field.bottom {
-      height: 15vh;
-      width: 24.5vw;
-      border-radius: 100vh 100vh 0 0;
-      border-color:black;
-      border-style: solid;
-      border-width: medium;
-    }
-    .goal.field.top {
-      top: 9.4%;
-      transform: translate(-50%, -50%) rotate(180deg);
-    }
-    .goal.field.bottom {
-      bottom: -10%;
-      transform: translate(-50%, -50%);
-    }
-    .midline {
-      width: 100%;
-      height: 0.235vh;
-      background-color: #000;
-      position: absolute;
-      top: 50%;
-      left: 0;
-    }
-    .mid.zone {
-      width: 15%;
-      height: 15%;
-      border-radius:50%;
-      position: absolute;
-      top: 42.5%;
-      left: 42.5%;
-      background-color: lightgrey;
-      border-color:black;
-      border-style: solid;
-      border-width: medium;
-    }
-
-    .player {
-      width: 5vh;
-      height: 5vh;
-      border-radius: 50%;
-      position: absolute;
-    }
-
-
-    .team1 {
-      background-color: #ff0000;
-    }
-
-    .team2 {
-      background-color: #008000;
-    }
-
-    .sponsor {
-      width: 30%;
-      height: 5%;
-      position: absolute;
-      background-color:black;
-    }
-
-    .ball {
-      width: 2vh;
-      height: 2vh;
-      border-radius: 50%;
-      background-color: #ff8c00;
-      position: absolute;
-      top: 20%;
-      left: 47.5%;
-      opacity: 0;
-    }
-
-    .banner1 {
-      top: 60%;
-      left: 35%;
-    }
-
-    .banner2 {
-      top: 67.5%;
-      left: 35%;
-    }
-
-    .banner3 {
-      top: 75%;
-      left: 35%;
-    }
-
-    .actionInfo {
-      display: none;
-      flex-direction: column;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: white;
-      padding: 10px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .playerInfo, .actionDetail {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      width: 100%;
-      justify-content: left;
-      align-items: center;
-      margin: 5px 0;
-    }
-
-    .playerImage {
-      width: 5vh;
-      height: auto;
-      margin-right: 5px;
-    }
-
-    .playerNumber, .playerName, #MATCH_TIME, #THROWING_PLAYER_ACTION {
-      font-size: 3vh;
-      margin: 0 5px;
-    }
-    .image {
-      display: none;
-    }
-
-  </style>
 </head>
 <body>
 
@@ -298,48 +56,48 @@
     <div class="sponsor banner2"></div>
     <div class="sponsor banner3"></div> -->
 
-    <div class="player team1" id="HOME_KEEPER" style="top: 0; left: 47.5%;">
+    <div class="player team1" id="HOME_KEEPER">
       <img class ="player image" id="HOME_KEEPER_IMAGE" src="">
     </div>
-    <div class="player team1" id="HOME_CENTER_3" style="top: 19.5%; left: 38%;">
-      <img class ="player image" id="HOME_CENTER_3_IMAGE" src="">
-    </div>
-    <div class="player team1" id="HOME_RIGHT_WING" style="top: 5%; left: 14%;">
+    <div class="player team1" id="HOME_RIGHT_WING">
       <img class ="player image" id="HOME_RIGHT_WING_IMAGE" src="">
     </div>
-    <div class="player team1" id="HOME_CENTER_4" style="top: 19.5%; left: 57%;">
-      <img class ="player image" id="HOME_CENTER_4_IMAGE" src="">
-    </div>
-    <div class="player team1" id="HOME_LEFT_WING" style="top: 5%; left: 80%;">
-      <img class ="player image" id="HOME_LEFT_WING_IMAGE" src="">
-    </div>
-    <div class="player team1" id="HOME_RIGHT_BACK" style="top: 15%; left: 22%;">
+    <div class="player team1" id="HOME_RIGHT_BACK">
       <img class ="player image" id="HOME_RIGHT_BACK_IMAGE" src="">
     </div>
-    <div class="player team1" id="HOME_LEFT_BACK" style="top: 15%; left: 72%;">
+    <div class="player team1" id="HOME_CENTER_3">
+      <img class ="player image" id="HOME_CENTER_3_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_CENTER_4">
+      <img class ="player image" id="HOME_CENTER_4_IMAGE" src="">
+    </div>
+    <div class="player team1" id="HOME_LEFT_BACK">
       <img class ="player image" id="HOME_LEFT_BACK_IMAGE" src="">
     </div>
+    <div class="player team1" id="HOME_LEFT_WING">
+      <img class ="player image" id="HOME_LEFT_WING_IMAGE" src="">
+    </div>
 
-    <div class="player team2" id="AWAY_LEFT_WING" style="top: 1%; left: 2%;">
-      <img class ="player image" id="AWAY_LEFT_WING_IMAGE" src="">
+    <div class="player team2" id="AWAY_KEEPER">
+      <img class ="player image" id="AWAY_KEEPER_IMAGE" src="">
     </div>
-    <div class="player team2" id="AWAY_LEFT_BACK" style="top: 26.5%; left: 15%;">
-      <img class="player image" id="AWAY_LEFT_BACK_IMAGE" src="/assets/henne.jpg">
-    </div>
-    <div class="player team2" id="AWAY_PLAYMAKER" style="top: 30.5%; left: 47.5%;">
-      <img class ="player image" id="AWAY_PLAYMAKER_IMAGE" src="">
-    </div>
-    <div class="player team2" id="AWAY_RIGHT_BACK" style="top: 26.5%; left: 80%;">
-      <img class ="player image" id="AWAY_RIGHT_BACK_IMAGE" src="http://localhost:8080/assets/henne.jpg">
-    </div>
-    <div class="player team2" id="AWAY_CENTER" style="top: 19.5%; left: 47.5%;">
-      <img class ="player image" id="AWAY_CENTER_IMAGE" src="">
-    </div>
-    <div class="player team2" id="AWAY_RIGHT_WING" style="top: 1%; left: 92%;">
+    <div class="player team2" id="AWAY_RIGHT_WING">
       <img class ="player image" id="AWAY_RIGHT_WING_IMAGE" src="">
     </div>
-    <div class="player team2" id="AWAY_KEEPER" style="top: 93.5%; left: 47.5%;">
-      <img class ="player image" id="AWAY_KEEPER_IMAGE" src="">
+    <div class="player team2" id="AWAY_RIGHT_BACK">
+      <img class ="player image" id="AWAY_RIGHT_BACK_IMAGE" src="http://localhost:8080/assets/henne.jpg">
+    </div>
+    <div class="player team2" id="AWAY_CENTER">
+      <img class ="player image" id="AWAY_CENTER_IMAGE" src="">
+    </div>
+    <div class="player team2" id="AWAY_PLAYMAKER">
+      <img class ="player image" id="AWAY_PLAYMAKER_IMAGE" src="">
+    </div>
+    <div class="player team2" id="AWAY_LEFT_BACK">
+      <img class="player image" id="AWAY_LEFT_BACK_IMAGE" src="/assets/henne.jpg">
+    </div>
+    <div class="player team2" id="AWAY_LEFT_WING">
+      <img class ="player image" id="AWAY_LEFT_WING_IMAGE" src="">
     </div>
 
 

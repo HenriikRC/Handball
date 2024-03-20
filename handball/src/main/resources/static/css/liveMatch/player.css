@@ -1,0 +1,84 @@
+#HOME_KEEPER {
+    margin: 0 50%;
+    top: 0%;
+    transform: translate(-50%, 10%);
+}
+
+#HOME_RIGHT_WING {
+    margin: 0 17.5%;
+    top: 8%;
+    transform: translate(-50%, -50%);
+}
+
+#HOME_RIGHT_BACK {
+    margin: 0 26%;
+    top: 19%;
+    transform: translate(-50%, -50%);
+}
+
+#HOME_CENTER_3 {
+    margin: 0 40%;
+    top: 23%;
+    transform: translate(-50%, -50%);
+}
+
+#HOME_CENTER_4 {
+    margin: 0 60%;
+    top: 23%;
+    transform: translate(-50%, -50%);
+}
+
+#HOME_LEFT_BACK {
+    margin: 0 74%;
+    top: 19%;
+    transform: translate(-50%, -50%);
+}
+
+#HOME_LEFT_WING {
+    margin: 0 82.5%;
+    top: 8%;
+    transform: translate(-50%, -50%);
+}
+
+
+#AWAY_KEEPER {
+    margin: 0 50%;
+    top: 100%;
+    transform: translate(-50%, -110%);
+}
+
+#AWAY_RIGHT_WING {
+    margin: 0 95%;
+    top: 4%;
+    transform: translate(-50%, -50%);
+}
+
+#AWAY_RIGHT_BACK {
+    margin: 0 85%;
+    top: 31.5%;
+    transform: translate(-50%, -50%);
+}
+
+#AWAY_CENTER {
+    margin: 0 50%;
+    top: 23%;
+    transform: translate(-50%, -50%);
+}
+
+#AWAY_PLAYMAKER {
+    margin: 0 50%;
+    top: 33%;
+    transform: translate(-50%, -50%);
+}
+
+#AWAY_LEFT_BACK {
+    margin: 0 15%;
+    top: 31.5%;
+    transform: translate(-50%, -50%);
+}
+
+#AWAY_LEFT_WING {
+    margin: 0 5%;
+    top: 4%;
+    transform: translate(-50%, -50%);
+}
