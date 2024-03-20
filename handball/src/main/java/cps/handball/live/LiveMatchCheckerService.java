@@ -29,7 +29,7 @@ public class LiveMatchCheckerService {
         this.context = context;
     }
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 30000) //300000
     public void checkForLiveMatches() {
         List<Match> unfinishedMatches = matchService.findUnfinishedMatches();
         LocalDateTime currentTime = LocalDateTime.now();
@@ -48,22 +48,6 @@ public class LiveMatchCheckerService {
                     System.out.println("Match is live: " + match.getId());
                 }
             }
-        });
-    }
-
-    private void stopFinishedMatches() {
-        activeScrapers.entrySet().removeIf(entry -> {
-            Optional<MatchDTO> matchOptional = matchService.getMatchById(entry.getKey());
-
-            if (matchOptional.isPresent()) {
-                MatchDTO match = matchOptional.get();
-
-                if (match.isFinished()) {
-                    entry.getValue().stopScraping();
-                    return true;
-                }
-            }
-            return false;
         });
     }
 }

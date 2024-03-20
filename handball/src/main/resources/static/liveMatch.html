@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Match</title>
   <script defer src="/handballAnimations.js"></script>
-  <script defer src="/liveMatchPreviousActionsFetch.js"></script>
+  <!--<script defer src="/liveMatchPreviousActionsFetch.js"></script>-->
+  <script defer src="/liveMatchActionSSE.js"></script>
   <style>
     .container {
       display: flex;
@@ -51,6 +52,10 @@
       list-style-type: none;
       padding: 0;
       margin: 2px;
+    }
+
+    li::marker {
+      display: none;
     }
 
 
@@ -268,27 +273,27 @@
     <img class="ball" id="ball" src="/assets/handball/ball.png">
 
     <div class="actionInfo" id="ACTION_INFO">
-    <div class="playerInfo mainPlayer" id="THROWING_PLAYER">
-      <img src="" class="playerImage" id="THROWING_PLAYER_TEAM_IMAGE">
-      <p class="playerNumber" id="THROWING_PLAYER_NUMBER"></p>
-      <p class="playerName" id="THROWING_PLAYER_NAME"></p>
+      <div class="playerInfo mainPlayer" id="THROWING_PLAYER">
+        <img src="" class="playerImage" id="THROWING_PLAYER_TEAM_IMAGE">
+        <p class="playerNumber" id="THROWING_PLAYER_NUMBER"></p>
+        <p class="playerName" id="THROWING_PLAYER_NAME"></p>
+      </div>
+      <div class="playerInfo assistingPlayer" id="ASSISTING_PLAYER" style="display: none;">
+        <img src="" class="playerImage" id="ASSISTING_PLAYER_TEAM_IMAGE">
+        <p class="playerNumber" id="ASSISTING_PLAYER_NUMBER"></p>
+        <p class="playerName" id="ASSISTING_PLAYER_NAME"></p>
+      </div>
+      <div class="actionDetail">
+        <p id="MATCH_TIME"></p>
+        <p>-</p>
+        <p id="THROWING_PLAYER_ACTION"></p>
+      </div>
+      <div class="playerInfo opponentPlayer" id="GOALKEEPER">
+        <img src="" class="playerImage" id="GOALKEEPER_TEAM_IMAGE">
+        <p class="playerNumber" id="GOALKEEPER_NUMBER"></p>
+        <p class="playerName" id="GOALKEEPER_NAME"></p>
+      </div>
     </div>
-    <div class="playerInfo assistingPlayer" id="ASSISTING_PLAYER" style="display: none;">
-      <img src="" class="playerImage" id="ASSISTING_PLAYER_TEAM_IMAGE">
-      <p class="playerNumber" id="ASSISTING_PLAYER_NUMBER"></p>
-      <p class="playerName" id="ASSISTING_PLAYER_NAME"></p>
-    </div>
-    <div class="actionDetail">
-      <p id="MATCH_TIME"></p>
-      <p>-</p>
-      <p id="THROWING_PLAYER_ACTION"></p>
-    </div>
-    <div class="playerInfo opponentPlayer" id="GOALKEEPER">
-      <img src="" class="playerImage" id="GOALKEEPER_TEAM_IMAGE">
-      <p class="playerNumber" id="GOALKEEPER_NUMBER"></p>
-      <p class="playerName" id="GOALKEEPER_NAME"></p>
-    </div>
-  </div>
     <!--<div class="sponsor banner1"></div>
     <div class="sponsor banner2"></div>
     <div class="sponsor banner3"></div> -->

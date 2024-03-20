@@ -1,9 +1,8 @@
 package cps.handball.live;
 
 import cps.handball.match.Match;
-import cps.handball.matchaction.MatchAction;
-import cps.handball.matchaction.MatchActionService;
-import cps.handball.matchaction.MatchActionType;
+import cps.handball.match.MatchService;
+import cps.handball.matchaction.*;
 import cps.handball.team.Team;
 import jakarta.transaction.Transactional;
 import org.openqa.selenium.By;
@@ -11,6 +10,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
@@ -23,15 +24,22 @@ public class LiveMatchScraperTask {
 
     private final TaskScheduler taskScheduler;
     private final MatchActionService matchActionService;
+    private final MatchService matchService;
     private final MatchActionEventPublisher eventPublisher;
+    private final MatchActionMapper matchActionMapper;
     private ScheduledFuture<?> futureTask;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LiveMatchScraperTask.class);
 
     public LiveMatchScraperTask(TaskScheduler taskScheduler,
                                 MatchActionService matchActionService,
-                                MatchActionEventPublisher eventPublisher) {
+                                MatchService matchService,
+                                MatchActionEventPublisher eventPublisher,
+                                MatchActionMapper matchActionMapper) {
         this.taskScheduler = taskScheduler;
         this.matchActionService = matchActionService;
+        this.matchService = matchService;
         this.eventPublisher = eventPublisher;
+        this.matchActionMapper = matchActionMapper;
     }
 
 
@@ -42,9 +50,9 @@ public class LiveMatchScraperTask {
     }
 
     private void scrapeMatch(Match match) {
-
         System.out.println("Scraping match data from: " + match.getMatchSiteLink());
         WebDriver driver = initSelenium();
+        boolean isMatchEndFound = false;
         try {
             String matchSiteLink = match.getMatchSiteLink();
             if (matchSiteLink == null || matchSiteLink.isEmpty()) {
@@ -58,17 +66,28 @@ public class LiveMatchScraperTask {
             for (WebElement element : matchBlocks) {
                 WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-center-img"));
                 String matchTime = timeElement.getText().trim();
-                System.out.println("Found " + matchBlocks.size() + " match blocks.");
+                //System.out.println("Found " + matchBlocks.size() + " match blocks.");
                 matchBlocks.forEach(block -> System.out.println(block.getText()));
                 MatchActionType matchActionType = determineMatchActionTypeFromBlock(element);
+                System.out.println("Checking if match end was found: " + isMatchEndFound);
+                if (matchActionType == MatchActionType.END) {
+                    System.out.println("MATCH END FOUND");
+                    isMatchEndFound = true;
+                    continue;
+                }
                 if (matchActionType != null && !matchActionService.checkIfExists(match.getId(), matchTime, matchActionType)) {
                     parseMatchBlocks(match, element);
                 }
             }
-            System.out.println("Parsed all TIME ACTIONS");
 
-            processMatchActions(driver, match, true); // for home team
-            processMatchActions(driver, match, false); // for away team
+            processMatchActions(driver, match, true);
+            processMatchActions(driver, match, false);
+
+            if (isMatchEndFound) {
+                System.out.println("MATCH END FOUND");
+                matchService.markMatchAsFinished(match.getId());
+                stopScraping(driver);
+            }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -106,8 +125,12 @@ public class LiveMatchScraperTask {
         String goalkeeperName = getGoalKeeperName(element);
         String assistingPlayerName = getAssistingPlayerName(element);
 
-        matchActionService.save(match, matchTime, attackingTeam, position,
+        MatchAction databaseMatchAction = matchActionService.save(match, matchTime, attackingTeam, position,
                 playerName, matchActionType, assistingPlayerName, defendingTeam, goalkeeperName);
+        MatchActionDTO matchActionDTO = matchActionMapper.toDTO(databaseMatchAction);
+        MatchActionEvent matchActionEvent = new MatchActionEvent(match.getId(), matchActionDTO);
+        LOGGER.info("Publishing match action event for match ID: {}", match.getId());
+        eventPublisher.publishMatchActionEvent(matchActionEvent);
     }
 
 
@@ -190,14 +213,25 @@ public class LiveMatchScraperTask {
     }
 
     private MatchActionType determineMatchActionTypeFromBlock(WebElement element) {
-        String text = element.getText().toUpperCase();
-        switch (text) {
-            case "KAMP START": return MatchActionType.START;
-            case "PAUSE": return MatchActionType.PAUSE;
-            case("PAUSE SLUT"):return MatchActionType.PAUSE_END;
-            case("FULDTID"):return MatchActionType.FULL_TIME;
-            case("KAMP SLUT"):return MatchActionType.END;
-            default: return null;
+        System.out.println("PRINTING ELEMENT BELOW");
+        System.out.println("Element: " + element.getText());
+        System.out.println("PRINTING TEXT BELOW");
+        String text = element.getText().toUpperCase().trim();
+        System.out.println("Extracted text: '" + text + "'");
+
+        if (text.contains("KAMP START")) {
+            return MatchActionType.START;
+        } else if (text.contains("PAUSE") && !text.contains("PAUSE SLUT")) {
+            return MatchActionType.PAUSE;
+        } else if (text.contains("PAUSE SLUT")) {
+            return MatchActionType.PAUSE_END;
+        } else if (text.contains("FULDTID")) {
+            return MatchActionType.FULL_TIME;
+        } else if (text.contains("KAMP SLUT")) {
+            return MatchActionType.END;
+        } else {
+            System.out.println("No match found for extracted text.");
+            return null;
         }
     }
     private void parseMatchBlocks(Match match, WebElement element) {
@@ -230,7 +264,11 @@ public class LiveMatchScraperTask {
                 break;
         }
 
-        matchActionService.save(matchAction);
+        MatchAction databaseMatchAction = matchActionService.save(matchAction);
+        MatchActionDTO matchActionDTO = matchActionMapper.toDTO(databaseMatchAction);
+        MatchActionEvent matchActionEvent = new MatchActionEvent(match.getId(), matchActionDTO);
+        LOGGER.info("Publishing match action event for match ID: {}", match.getId());
+        eventPublisher.publishMatchActionEvent(matchActionEvent);
     }
 
     private WebDriver initSelenium() {
@@ -242,9 +280,11 @@ public class LiveMatchScraperTask {
         return new ChromeDriver(options);
     }
 
-    public void stopScraping() {
-        if (futureTask != null) {
-            futureTask.cancel(false);
+    public void stopScraping(WebDriver driver) {
+        if (futureTask != null && !futureTask.isCancelled()) {
+            driver.quit();
+            boolean wasCancelled = futureTask.cancel(true);
+            System.out.println("Scraping task cancellation attempted, success: " + wasCancelled);
         }
     }
 }

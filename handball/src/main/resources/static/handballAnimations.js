@@ -1,24 +1,37 @@
-let throwingPlayerPos = "AWAY_RIGHT_WING";
-let throwingPlayerName = "Henrik Christensen";
-let throwingPlayerJerseyNumber = "18";
-let throwingPlayerImageLink = "http://localhost:8080/assets/henne.jpg";
-let throwingPlayerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
-let goalKeeperPos = 'HOME_KEEPER';
+let playerTeamId = 1;
+let playerTeamName = "playerTeamName";
+let playerTeamShortName = "playerTeamShortName";
+let playerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
+
+let playerPosition = "AWAY_RIGHT_WING";
+let playerName = "Henrik Christensen";
+let playerJerseyNumber = "18";
+let playerImageLink  = "http://localhost:8080/assets/henne.jpg";
+
+let assistingPlayerName = null;
+let assistingPlayerJerseyNumber = "100";
+let assistingPlayerPosition = "http://localhost:8080/assets/henne.jpg";
+let assistingPlayerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
+
+let opponentTeamId = 2;
+let opponentTeamName = "opponentTeamName";
+let opponentTeamShortName = "opponentTeamShortName";
+let opponentTeamImageLink = "http://localhost:8080/assets/images/team/";
+
+let goalKeeperPosition = 'HOME_KEEPER';
 let goalKeeperName = "Magnus Brandbyge";
 let goalKeeperJerseyNumber = "1";
 let goalKeeperImageLink = "http://localhost:8080/assets/Henrik.jpg";
-let goalKeeperTeamImageLink = "http://localhost:8080/assets/fhk-logo.png";
-let assistingPlayerName = null;
-let assistingPlayerJerseyNumber = "100";
-let assistingPlayerImageLink = "http://localhost:8080/assets/henne.jpg";
-let assistingPlayerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
+
 let opponentPlayerPos = "HOME_LEFT_WING";
 let opponentPlayerName = "Lasse Hvilsted";
 let opponentPlayerJerseyNumber = "50";
 let opponentPlayerImageLink = "http://localhost:8080/assets/Henrik.jpg";
-let opponentPlayerTeamImageLink = "http://localhost:8080/assets/fhk-logo.png";
+
 let matchTime = "33:12";
 let actionType = "CAUGHT";
+
+
 const missedSpotsTop = [
     { top: '5%', left: '10%' },
     { top: '5%', left: '90%' }
@@ -27,6 +40,45 @@ const missedSpotsTop = [
 const url = window.location.href;
 const matchId = url.split('/').pop();
 console.log("Match ID = " + matchId);
+
+function updateActionData(actionData) {
+    playerTeamId = actionData.teamId || null;
+    playerTeamName = actionData.teamName || null;
+    playerTeamShortName = actionData.teamShortName || null;
+    playerTeamImageLink = actionData.teamImageLink || null;
+
+    playerPosition = actionData.playerPosition || null;
+    playerName = actionData.playerName || null;
+    playerJerseyNumber = actionData.playerJerseyNumber || null;
+    playerImageLink = actionData.playerImageLink || null;
+
+    assistingPlayerName = actionData.assistingPlayerName || null;
+    assistingPlayerJerseyNumber = actionData.assistingPlayerJerseyNumber || null;
+    assistingPlayerPosition = actionData.assistingPlayerPosition || null;
+    assistingPlayerTeamImageLink = actionData.assistingPlayerTeamImageLink || null;
+
+    opponentTeamId = actionData.opponentTeamid || null;
+    opponentTeamName = actionData.opponentTeamName || null;
+    opponentTeamShortName = actionData.opponentTeamShortName || null;
+    opponentTeamImageLink = actionData.opponentTeamImageLink || null;
+
+    goalKeeperName = actionData.goalKeeperName || null;
+    goalKeeperPosition = actionData.goalKeeperPosition || null;
+    goalKeeperJerseyNumber = actionData.goalKeeperJerseyNumber || null;
+    goalKeeperImageLink = actionData.goalKeeperImageLink || null;
+
+    opponentPlayerPos = actionData.opponentPlayerPos || null;
+    opponentPlayerName = actionData.opponentPlayerName || null;
+    opponentPlayerJerseyNumber = actionData.opponentPlayerJerseyNumber || null;
+    opponentPlayerImageLink = actionData.opponentPlayerImageLink || null;
+
+    matchTime = actionData.matchTime;
+    actionType = actionData.actionType;
+
+    console.log(actionData);
+
+    action();
+}
 
 function updatePlayerInfo(playerIdPrefix, playerName, playerNumber, playerImageLink, teamImageLink) {
     const playerTeamImage = document.getElementById(`${playerIdPrefix}_TEAM_IMAGE`);
@@ -39,17 +91,17 @@ function updatePlayerInfo(playerIdPrefix, playerName, playerNumber, playerImageL
 }
 
 function displayActionInfo() {
-    updatePlayerInfo('THROWING_PLAYER', throwingPlayerName, throwingPlayerJerseyNumber, throwingPlayerImageLink, throwingPlayerTeamImageLink);
+    updatePlayerInfo('THROWING_PLAYER', playerName, playerJerseyNumber, playerImageLink , playerTeamImageLink);
 
     const assistingPlayerDiv = document.getElementById("ASSISTING_PLAYER");
     if (assistingPlayerName != null) {
-        updatePlayerInfo('ASSISTING_PLAYER', assistingPlayerName, assistingPlayerJerseyNumber, assistingPlayerImageLink, assistingPlayerTeamImageLink);
+        updatePlayerInfo('ASSISTING_PLAYER', assistingPlayerName, assistingPlayerJerseyNumber, assistingPlayerPosition , assistingPlayerTeamImageLink);
         assistingPlayerDiv.style.display = "flex";
     } else {
         assistingPlayerDiv.style.display = "none";
     }
 
-    updatePlayerInfo('GOALKEEPER', goalKeeperName, goalKeeperJerseyNumber, goalKeeperImageLink, goalKeeperTeamImageLink);
+    updatePlayerInfo('GOALKEEPER', goalKeeperName, goalKeeperJerseyNumber, goalKeeperImageLink, opponentTeamImageLink);
 
     document.getElementById("MATCH_TIME").innerText = matchTime;
     document.getElementById("THROWING_PLAYER_ACTION").innerText = actionType;
@@ -59,17 +111,23 @@ function displayActionInfo() {
 
 function throwBall() {
     displayActionInfo();
+    let positionString = "";
+    if(playerTeamName === homeTeamName) {
+        positionString += "HOME_";
+    } else {
+        positionString += "AWAY_"
+    }
 
-    const playerImage = document.getElementById((throwingPlayerPos+"_IMAGE"));
-    playerImage.src = throwingPlayerImageLink;
+    const playerImage = document.getElementById((positionString+playerPosition+"_IMAGE"));
+    playerImage.src = playerImageLink ;
     playerImage.style.display = "unset";
-    const goalKeeperImage = document.getElementById((goalKeeperPos+"_IMAGE"));
+    const goalKeeperImage = document.getElementById((goalKeeperPosition+"_IMAGE"));
     goalKeeperImage.src = goalKeeperImageLink;
     goalKeeperImage.style.display = "unset";
 
-    const playerElement = document.getElementById(throwingPlayerPos);
+    const playerElement = document.getElementById(playerPosition);
     if (!playerElement) {
-        console.error('Player element not found:', throwingPlayerPos);
+        console.error('Player element not found:', playerPosition);
         return;
     }
 
@@ -125,8 +183,13 @@ function action() {
 function throwMissedBall() {
     displayActionInfo();
 
-    const playerImage = document.getElementById((throwingPlayerPos+"_IMAGE"));
-    playerImage.src = throwingPlayerImageLink;
+    const playerImage = document.getElementById((playerPosition+"_IMAGE"));
+    if(playerImageLink != null){
+        playerImage.src = playerImageLink ;
+    } else {
+        playerImage.src = "http://localhost:8080/assets/images/player/player.png";
+    }
+
     playerImage.style.display = "block";
 
     const ball = document.getElementById('ball');
@@ -168,11 +231,20 @@ function throwMissedBall() {
 function throwCaughtBall() {
     displayActionInfo();
 
-    const playerImage = document.getElementById((throwingPlayerPos + "_IMAGE"));
-    const goalKeeperImage = document.getElementById((goalKeeperPos + "_IMAGE"));
+    const playerImage = document.getElementById((playerPosition + "_IMAGE"));
+    const goalKeeperImage = document.getElementById((goalKeeperPosition + "_IMAGE"));
 
-    playerImage.src = throwingPlayerImageLink;
-    goalKeeperImage.src = goalKeeperImageLink;
+    if(playerImageLink != null){
+        playerImage.src = playerImageLink ;
+    } else {
+        playerImage.src = "http://localhost:8080/assets/images/player/player.png";
+    }
+
+    if(goalKeeperImageLink != null) {
+        goalKeeperImage.src = goalKeeperImageLink;
+    } else {
+        goalKeeperImage.src = "http://localhost:8080/assets/images/player/player.png";
+    }
 
     playerImage.style.display = "block";
     goalKeeperImage.style.display = "block";

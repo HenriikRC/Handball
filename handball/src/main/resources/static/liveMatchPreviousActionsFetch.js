@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+/*document.addEventListener('DOMContentLoaded', function() {
     const url = window.location.href;
     const matchId = url.split('/').pop();
     console.log("Match ID = " + matchId);
@@ -58,3 +58,6 @@ function fetchMatchActions(matchId) {
         })
         .catch(error => console.error('Error fetching match details:', error));
 }
+
+
+ */

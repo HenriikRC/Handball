@@ -1,40 +1,123 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Fetch initial match actions data
     const url = window.location.href;
     const matchId = url.split('/').pop();
     console.log("Match ID = " + matchId);
-    fetchMatchActions(matchId);
 
+    fetchInitialMatchActions(matchId);
+    setupSSE(matchId);
+});
+
+let homeTeamName = "homeTeamName";
+let awayTeamName = "awayTeamName";
+function fetchInitialMatchActions(matchId) {
+    fetch(`/api/v1/matches/${matchId}`)
+        .then(response => response.json())
+        .then(match => {
+            homeTeamName = match.homeTeamName;
+            awayTeamName = match.awayTeamName;
+
+            fetch(`/api/v1/matchactions/${matchId}`)
+                .then(response => response.json())
+                .then(matchActions => {
+                    const matchActionsContainer = document.getElementById('matchActionsContainer');
+                    matchActions.forEach(action => {
+                        const actionElement = createMatchActionElement(action, homeTeamName, awayTeamName);
+                        matchActionsContainer.appendChild(actionElement);
+                        document.querySelectorAll('.matchEvent').forEach(function(element) {
+                            element.style.listStyleType = 'none';
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching match actions:', error));
+        })
+        .catch(error => console.error('Error fetching match details:', error));
+}
+
+function setupSSE(matchId) {
     // Establish SSE connection
     const eventSource = new EventSource(`/api/v1/live/matchactions/${matchId}/stream`);
 
     // Event listener for receiving match actions
-    eventSource.addEventListener('matchAction', function(event) {
-        const newMatchAction = JSON.parse(event.data);
-        console.log('New match action received:', newMatchAction);
+    eventSource.addEventListener('message', function(event) {
+        const matchAction = JSON.parse(event.data);
+        console.log('New match action received:', matchAction);
+        updateMatchActions(matchAction);
+        const actionData = {
+            teamId: matchAction.team?.id,
+            teamName: matchAction.team?.name,
+            teamShortName: matchAction.team?.shortName,
+            teamImageLink: matchAction.team?.shortName ? "http://localhost:8080/assets/images/team/" + matchAction.team.shortName + ".png" : null,
 
-        updateMatchActions(newMatchAction);
+            playerName: matchAction.player?.name,
+            playerPosition: matchAction.matchActionPositionType ? matchAction.matchActionPositionType : null,
+            playerJerseyNumber: matchAction.player?.playerNumber,
+            playerImageLink: matchAction.player?.playerImageLink,
+
+            assistingPlayerName: matchAction.assistingPlayer?.name,
+            assistingPlayerJerseyNumber: matchAction.assistingPlayer?.playerNumber,
+            assistingPlayerPosition: matchAction.assistingPlayer?.positionType,
+            assistingPlayerTeamImageLink: matchAction.assistingPlayer?.playerImageLink,
+
+            opponentTeamid: matchAction.opponentTeam?.id,
+            opponentTeamName: matchAction.opponentTeam?.name,
+            opponentTeamShortName: matchAction.opponentTeam?.shortName,
+            opponentTeamImageLink: matchAction.opponentTeam?.shortName ? "http://localhost:8080/assets/images/team/" + matchAction.opponentTeam.shortName + ".png" : null,
+
+            goalKeeperName: matchAction.goalKeeper?.name,
+            goalKeeperPosition: matchAction.goalKeeper?.positionType,
+            goalKeeperJerseyNumber: matchAction.goalKeeper?.playerNumber,
+            goalKeeperImageLink: matchAction.goalKeeper?.playerImageLink,
+
+            opponentPlayerName: matchAction.opponentPlayer?.name,
+            opponentPlayerPos: matchAction.opponentPlayer?.positionType,
+            opponentPlayerJerseyNumber: matchAction.opponentPlayer?.playerNumber,
+            opponentPlayerImageLink: matchAction.opponentPlayer?.playerImageLink,
+
+            matchTime: matchAction.matchTime,
+            actionType: matchAction.matchActionType
+        };
+        updateActionData(actionData);
     });
-});
-
-function fetchMatchActions(matchId) {
 }
 
-function updateMatchActions(newMatchAction) {
+function createMatchActionElement(action, homeTeamName, awayTeamName) {
+    let cssClass = 'centerContent';
+    if (action.team) {
+        cssClass = action.team.name === homeTeamName ? 'leftMarker' : 'rightMarker';
+    }
+
+    let playerInfo = '';
+    if (action.player) {
+        playerInfo = `<div class="matchEventLine">
+                        <span><span>${action.team ? action.team.shortName : ''}</span>Player: <span>${action.player.name}</span></span><br>
+                      </div>`;
+    }
+
+    let goalKeeperInfo = '';
+    if (action.goalKeeper) {
+        goalKeeperInfo = `<div class="matchEventLine">
+                            <span>Keeper: <span>${action.goalKeeper.name}</span></span><br>
+                          </div>`;
+    }
+
+    const listItem = document.createElement('li');
+    listItem.className = `matchEvent ${cssClass}`;
+    listItem.innerHTML = `
+        <div class="matchEventLine">
+            <span class="matchEventLine action">${action.matchActionType}</span>
+        </div>
+        ${playerInfo}
+        ${goalKeeperInfo}
+    `;
+
+    return listItem;
+}
+
+function updateMatchActions(newMatchAction, homeTeamName, awayTeamName) {
     const matchActionsContainer = document.getElementById('matchActionsContainer');
-    const cssClass = newMatchAction.team ? (newMatchAction.team.name === 'homeTeam' ? 'leftMarker' : 'rightMarker') : 'centerContent';
-    const playerInfo = newMatchAction.player ? `<div class="matchEventLine">
-                            <span><span>${newMatchAction.team ? newMatchAction.team.shortName : ''}</span>Player: <span>${newMatchAction.player.name}</span></span><br>
-                            </div>` : '';
-    const goalKeeperInfo = newMatchAction.goalKeeper ? `<div class="matchEventLine">
-                            <span>Keeper: <span>${newMatchAction.goalKeeper.name}</span></span><br>
-                            </div>` : '';
-    const html = `<li class="matchEvent ${cssClass}">
-                    <div class="matchEventLine">
-                    <span class="matchEventLine action">${newMatchAction.matchActionType}</span>
-                    </div>
-                    ${playerInfo}
-                    ${goalKeeperInfo}
-                </li>`;
-    matchActionsContainer.innerHTML += html;
+    const actionElement = createMatchActionElement(newMatchAction, homeTeamName, awayTeamName);
+    matchActionsContainer.appendChild(actionElement);
+    document.querySelectorAll('.matchEvent').forEach(function(element) {
+        element.style.listStyleType = 'none';
+    });
 }

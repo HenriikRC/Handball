@@ -1,21 +1,22 @@
 package cps.handball.live;
 
+import cps.handball.matchaction.MatchActionDTO;
+
 public class MatchActionEvent {
 
     private final Long matchId;
-    private final Object matchAction;
+    private final MatchActionDTO matchActionDTO;
 
-    public MatchActionEvent(Long matchId, Object matchAction) {
+    public MatchActionEvent(Long matchId, MatchActionDTO matchActionDTO) {
         this.matchId = matchId;
-        this.matchAction = matchAction;
+        this.matchActionDTO = matchActionDTO;
     }
 
     public Long getMatchId() {
         return matchId;
     }
 
-    public Object getMatchAction() {
-        return matchAction;
+    public MatchActionDTO getMatchAction() {
+        return matchActionDTO;
     }
 }
-

@@ -1,5 +1,6 @@
 package cps.handball.match;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,14 @@ public class MatchService {
     public Optional<MatchDTO> getMatchById(Long id) {
         Optional<Match> matchOptional = matchRepository.findMatchById(id);
         return matchOptional.map(matchMapper::toDTO);
+    }
+
+    @Transactional
+    public void markMatchAsFinished(Long matchId) {
+        System.out.println("In matchService " + matchId);
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new EntityNotFoundException("Match not found with id " + matchId));
+        match.setFinished(true);
+        matchRepository.save(match);
     }
 
 }
