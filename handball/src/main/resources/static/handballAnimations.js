@@ -3,7 +3,7 @@ let playerTeamName = "playerTeamName";
 let playerTeamShortName = "playerTeamShortName";
 let playerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
 
-let playerPosition = "AWAY_RIGHT_WING";
+let playerPosition = "RIGHT_WING";
 let playerName = "Henrik Christensen";
 let playerJerseyNumber = "18";
 let playerImageLink  = "http://localhost:8080/assets/henne.jpg";
@@ -16,7 +16,7 @@ let assistingPlayerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
 let opponentTeamId = 2;
 let opponentTeamName = "opponentTeamName";
 let opponentTeamShortName = "opponentTeamShortName";
-let opponentTeamImageLink = "http://localhost:8080/assets/images/team/";
+let opponentTeamImageLink = "http://localhost:8080/assets/images/team/FHK.png";
 
 let goalKeeperPosition = 'HOME_KEEPER';
 let goalKeeperName = "Magnus Brandbyge";
@@ -30,7 +30,7 @@ let opponentPlayerImageLink = "http://localhost:8080/assets/Henrik.jpg";
 
 let matchTime = "33:12";
 let actionType = "CAUGHT";
-
+let homeTeamName = "playerTeamName";
 
 const missedSpotsTop = [
     { top: '5%', left: '10%' },
@@ -119,7 +119,7 @@ function throwBall() {
     }
 
     const playerImage = document.getElementById((positionString+playerPosition+"_IMAGE"));
-    playerImage.src = playerImageLink ;
+    playerImage.src = playerImageLink;
     playerImage.style.display = "unset";
     const goalKeeperImage = document.getElementById((goalKeeperPosition+"_IMAGE"));
     goalKeeperImage.src = goalKeeperImageLink;

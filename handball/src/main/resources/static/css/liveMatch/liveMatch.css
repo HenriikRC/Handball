@@ -92,16 +92,16 @@ li::marker {
     position: relative;
     border-color: black;
     border-style:solid;
-    border-width: medium;
+    border-width: 0.2rem;
 }
 .goal {
-    width: 20vh;
-    height: 6vh;
+    width: 24%;
+    height: 8%;
     background-color: #fff;
     position: absolute;
     border-color:black;
     border-style: solid;
-    border-width: medium;
+    border-width: 0.2rem;
 }
 .goal.top, .goal.bottom {
     background-color:lightgrey;
@@ -124,7 +124,7 @@ li::marker {
     border-radius: 100vh 100vh 0 0;
     border-color:black;
     border-style: solid;
-    border-width: medium;
+    border-width: 0.2rem;
 }
 .goal.field.top {
     margin: 0 50%;
@@ -152,7 +152,7 @@ li::marker {
     background-color: lightgrey;
     border-color:black;
     border-style: solid;
-    border-width: medium;
+    border-width: 0.2rem;
     margin: 0 50%;
     bottom: 50%;
     transform: translate(-50%,50%)
