@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -35,16 +36,16 @@ public class LiveMatchController {
     public void onMatchActionEvent(MatchActionEvent event) {
         Long matchId = event.getMatchId();
         Object matchAction = event.getMatchAction();
-
-        SseEmitter emitter = emitters.get(matchId);
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event().data(matchAction));
-            } catch (Exception e) {
-                logger.error("Error sending SSE for match ID: {}", matchId, e);
-                emitter.completeWithError(e);
+        for (Map.Entry<Long, SseEmitter> entry : emitters.entrySet()) {
+            SseEmitter emitter = emitters.get(matchId);
+            if (emitter != null) {
+                try {
+                    emitter.send(SseEmitter.event().data(matchAction));
+                } catch (Exception e) {
+                    logger.error("Error sending SSE for match ID: {}", matchId, e);
+                    emitter.completeWithError(e);
+                }
             }
         }
     }
-
 }

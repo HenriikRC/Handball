@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSSE(matchId);
 });
 
-let homeTeamName = "homeTeamName";
-let awayTeamName = "awayTeamName";
+
 function fetchInitialMatchActions(matchId) {
     fetch(`/api/v1/matches/${matchId}`)
         .then(response => response.json())
