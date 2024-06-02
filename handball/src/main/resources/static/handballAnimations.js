@@ -81,11 +81,13 @@ function updateActionData(actionData) {
 }
 
 function updatePlayerInfo(playerIdPrefix, playerName, playerNumber, playerImageLink, teamImageLink) {
-    const playerTeamImage = document.getElementById(`${playerIdPrefix}_TEAM_IMAGE`);
-    const playerNumberEl = document.getElementById(`${playerIdPrefix}_NUMBER`);
-    const playerNameEl = document.getElementById(`${playerIdPrefix}_NAME`);
+    let playerTeamImage = document.getElementById(`${playerIdPrefix}_TEAM_IMAGE`);
+    let playerImage = document.getElementById(`${playerIdPrefix}_IMAGE_SMALL`);
+    let playerNumberEl = document.getElementById(`${playerIdPrefix}_NUMBER`);
+    let playerNameEl = document.getElementById(`${playerIdPrefix}_NAME`);
 
     playerTeamImage.src = teamImageLink;
+    playerImage.src = playerImageLink;
     playerNumberEl.innerText = playerNumber ? `#${playerNumber}` : '';
     playerNameEl.innerText = playerName;
 }
@@ -106,6 +108,8 @@ function displayActionInfo() {
     document.getElementById("MATCH_TIME").innerText = matchTime;
     document.getElementById("THROWING_PLAYER_ACTION").innerText = actionType;
     document.getElementById("ACTION_INFO").style.display = "flex";
+
+    action();
 }
 
 
