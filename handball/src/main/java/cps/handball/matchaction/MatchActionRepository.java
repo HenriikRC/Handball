@@ -11,7 +11,7 @@ public interface MatchActionRepository extends JpaRepository<MatchAction, Long> 
 
     List<MatchAction> findMatchActionByMatchId(Long matchId);
 
-    List<MatchAction> findMatchActionsByMatchIdOrderByMatchTimeDesc(Long matchId);
+    List<MatchAction> findMatchActionsByMatchIdOrderByMatchTimeAsc(Long matchId);
 
     boolean existsByMatchIdAndMatchTimeAndMatchActionType(Long matchId, String matchTime, MatchActionType matchActionType);
 

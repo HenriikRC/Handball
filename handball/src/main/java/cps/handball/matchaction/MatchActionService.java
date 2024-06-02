@@ -76,7 +76,7 @@ public class MatchActionService {
     }
 
     public List<MatchActionDTO> findMatchActionsByMatchIdOrderByMatchTimeDesc(Long matchID) {
-        List<MatchAction> matchActions = matchActionRepository.findMatchActionsByMatchIdOrderByMatchTimeDesc(matchID);
+        List<MatchAction> matchActions = matchActionRepository.findMatchActionsByMatchIdOrderByMatchTimeAsc(matchID);
         return matchActionMapper.toDTO(matchActions);
     }
 

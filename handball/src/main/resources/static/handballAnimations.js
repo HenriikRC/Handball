@@ -1,45 +1,6 @@
-let playerTeamId = 1;
-let playerTeamName = "playerTeamName";
-let playerTeamShortName = "playerTeamShortName";
-let playerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
-
-let playerPosition = "RIGHT_WING";
-let playerName = "Henrik Christensen";
-let playerJerseyNumber = "18";
-let playerImageLink  = "http://localhost:8080/assets/henne.jpg";
-
-let assistingPlayerName = null;
-let assistingPlayerJerseyNumber = "100";
-let assistingPlayerPosition = "http://localhost:8080/assets/henne.jpg";
-let assistingPlayerTeamImageLink = "http://localhost:8080/assets/kif-logo.png";
-
-let opponentTeamId = 2;
-let opponentTeamName = "opponentTeamName";
-let opponentTeamShortName = "opponentTeamShortName";
-let opponentTeamImageLink = "http://localhost:8080/assets/images/team/FHK.png";
-
-let goalKeeperPosition = 'HOME_KEEPER';
-let goalKeeperName = "Magnus Brandbyge";
-let goalKeeperJerseyNumber = "1";
-let goalKeeperImageLink = "http://localhost:8080/assets/Henrik.jpg";
-
-let opponentPlayerPos = "HOME_LEFT_WING";
-let opponentPlayerName = "Lasse Hvilsted";
-let opponentPlayerJerseyNumber = "50";
-let opponentPlayerImageLink = "http://localhost:8080/assets/Henrik.jpg";
-
-let matchTime = "33:12";
-let actionType = "CAUGHT";
-let homeTeamName = "playerTeamName";
-
-const missedSpotsTop = [
-    { top: '5%', left: '10%' },
-    { top: '5%', left: '90%' }
-];
-
-const url = window.location.href;
-const matchId = url.split('/').pop();
-console.log("Match ID = " + matchId);
+document.addEventListener('DOMContentLoaded', function() {
+    checkGoal();
+});
 
 function updateActionData(actionData) {
     playerTeamId = actionData.teamId || null;
@@ -86,10 +47,10 @@ function updatePlayerInfo(playerIdPrefix, playerName, playerNumber, playerImageL
     let playerNumberEl = document.getElementById(`${playerIdPrefix}_NUMBER`);
     let playerNameEl = document.getElementById(`${playerIdPrefix}_NAME`);
 
-    playerTeamImage.src = teamImageLink;
-    playerImage.src = playerImageLink;
-    playerNumberEl.innerText = playerNumber ? `#${playerNumber}` : '';
-    playerNameEl.innerText = playerName;
+    if (playerTeamImage) playerTeamImage.src = teamImageLink;
+    if (playerImage) playerImage.src = playerImageLink;
+    if (playerNumberEl) playerNumberEl.innerText = playerNumber ? `#${playerNumber}` : '';
+    if (playerNameEl) playerNameEl.innerText = playerName;
 }
 
 function displayActionInfo() {
@@ -98,40 +59,56 @@ function displayActionInfo() {
     const assistingPlayerDiv = document.getElementById("ASSISTING_PLAYER");
     if (assistingPlayerName != null) {
         updatePlayerInfo('ASSISTING_PLAYER', assistingPlayerName, assistingPlayerJerseyNumber, assistingPlayerImageLink , playerTeamImageLink);
-        assistingPlayerDiv.style.display = "flex";
+        if (assistingPlayerDiv) assistingPlayerDiv.style.display = "flex";
     } else {
-        assistingPlayerDiv.style.display = "none";
+        if (assistingPlayerDiv) assistingPlayerDiv.style.display = "none";
     }
 
     updatePlayerInfo('GOALKEEPER', goalKeeperName, goalKeeperJerseyNumber, goalKeeperImageLink, opponentTeamImageLink);
 
-    document.getElementById("MATCH_TIME").innerText = matchTime;
-    document.getElementById("THROWING_PLAYER_ACTION").innerText = actionType;
-    document.getElementById("ACTION_INFO").style.display = "flex";
+    const matchTimeEl = document.getElementById("MATCH_TIME");
+    const actionEl = document.getElementById("THROWING_PLAYER_ACTION");
+    const actionInfoEl = document.getElementById("ACTION_INFO");
 
+    if (matchTimeEl) matchTimeEl.innerText = matchTime;
+    if (actionEl) actionEl.innerText = actionType;
+    if (actionInfoEl) actionInfoEl.style.display = "flex";
 }
-
 
 function throwBall() {
     displayActionInfo();
     let positionString = "";
-    if(playerTeamName === homeTeamName) {
+    let opponentPositionString = "";
+    if (playerTeamName === homeTeamName) {
         positionString += "HOME_";
+        opponentPositionString += "AWAY_";
     } else {
-        positionString += "AWAY_"
+        positionString += "AWAY_";
+        opponentPositionString += "HOME_";
     }
 
-    const playerImage = document.getElementById((positionString+playerPosition+"_IMAGE"));
-    playerImage.src = playerImageLink;
-    playerImage.style.display = "unset";
-    const goalKeeperImage = document.getElementById((goalKeeperPosition+"_IMAGE"));
-    goalKeeperImage.src = goalKeeperImageLink;
-    goalKeeperImage.style.display = "unset";
+    const playerImage = document.getElementById(`${positionString}${playerPosition}_IMAGE`);
+    if (playerImage) {
+        playerImage.src = playerImageLink;
+        playerImage.style.display = "unset";
+    }
 
-    const playerElement = document.getElementById(playerPosition);
+    const goalKeeperImage = document.getElementById(`${opponentPositionString}${goalKeeperPosition}_IMAGE`);
+    if (goalKeeperImage) {
+        goalKeeperImage.src = goalKeeperImageLink;
+        goalKeeperImage.style.display = "unset";
+    }
+
+    const playerElement = document.getElementById(`${positionString}${playerPosition}`);
     if (!playerElement) {
-        console.error('Player element not found:', playerPosition);
+        console.error('Player element not found:', `${positionString}${playerPosition}`);
         return;
+    }
+
+    const assistingPlayerImage = document.getElementById(`${positionString}${assistingPlayerPosition}_IMAGE`);
+    if(assistingPlayerImage){
+        assistingPlayerImage.src = assistingPlayerImageLink;
+        assistingPlayerImage.style.display = "unset";
     }
 
     const fieldRect = document.querySelector('.field').getBoundingClientRect();
@@ -144,30 +121,88 @@ function throwBall() {
     const playerYPercentage = `${(playerYRelativeToField / fieldRect.height) * 100}%`;
 
     const ball = document.getElementById('ball');
-    ball.style.position = 'absolute';
-    ball.style.opacity = '1';
-    ball.style.top = playerYPercentage;
-    ball.style.left = playerXPercentage;
-    ball.style.transform = 'translate(-50%, -50%)';
 
-    const keyframes = [
-        { top: playerYPercentage, left: playerXPercentage, transform: 'rotate(0deg)'},
-        { top: '-6.4vh', left: '50%', transform: 'rotate(1060deg)'}
-    ];
+    if (assistingPlayerName) {
+        const assistingPlayerElement = document.getElementById(`${positionString}${assistingPlayerPosition}`);
+        if (!assistingPlayerElement) {
+            console.error('Assisting player element not found:', `${positionString}${assistingPlayerPosition}`);
+            return;
+        }
 
-    ball.animate(keyframes, {
-        duration: 2000,
-        fill: 'forwards'
-    });
+        const assistingPlayerRect = assistingPlayerElement.getBoundingClientRect();
+        const assistingPlayerXRelativeToField = ((assistingPlayerRect.left + assistingPlayerRect.right) / 2) - fieldRect.left;
+        const assistingPlayerYRelativeToField = ((assistingPlayerRect.top + assistingPlayerRect.bottom) / 2) - fieldRect.top;
 
+        const assistingPlayerXPercentage = `${(assistingPlayerXRelativeToField / fieldRect.width) * 100}%`;
+        const assistingPlayerYPercentage = `${(assistingPlayerYRelativeToField / fieldRect.height) * 100}%`;
 
-    setTimeout(() => {
-        ball.style.opacity = '0';
-        document.getElementById("ACTION_INFO").style.display = "none";
-        playerImage.style.display = "none";
-        goalKeeperImage.style.display = "none";
-    }, 4500);
+        if (ball) {
+            ball.style.position = 'absolute';
+            ball.style.opacity = '1';
+            ball.style.top = assistingPlayerYPercentage;
+            ball.style.left = assistingPlayerXPercentage;
+            ball.style.transform = 'translate(-50%, -50%)';
+
+            const keyframesToPlayer = [
+                { top: assistingPlayerYPercentage, left: assistingPlayerXPercentage, transform: 'rotate(0deg)' },
+                { top: playerYPercentage, left: playerXPercentage, transform: 'rotate(360deg)' }
+            ];
+
+            ball.animate(keyframesToPlayer, {
+                duration: 1000,
+                fill: 'forwards'
+            }).onfinish = () => {
+                const keyframesToGoal = [
+                    { top: playerYPercentage, left: playerXPercentage, transform: 'rotate(0deg)' },
+                    { top: '-6.4vh', left: '50%', transform: 'rotate(1060deg)' }
+                ];
+
+                ball.animate(keyframesToGoal, {
+                    duration: 2000,
+                    fill: 'forwards'
+                });
+
+                setTimeout(() => {
+                    ball.style.opacity = '0';
+                    const actionInfoEl = document.getElementById("ACTION_INFO");
+                    if (actionInfoEl) actionInfoEl.style.display = "none";
+                    if (playerImage) playerImage.style.display = "none";
+                    if (goalKeeperImage) goalKeeperImage.style.display = "none";
+                    if (assistingPlayerImage) assistingPlayerImage.style.display = "none";
+                }, 4500);
+            };
+        }
+    } else {
+        if (ball) {
+            ball.style.position = 'absolute';
+            ball.style.opacity = '1';
+            ball.style.top = playerYPercentage;
+            ball.style.left = playerXPercentage;
+            ball.style.transform = 'translate(-50%, -50%)';
+
+            const keyframes = [
+                { top: playerYPercentage, left: playerXPercentage, transform: 'rotate(0deg)' },
+                { top: '-6.4vh', left: '50%', transform: 'rotate(1060deg)' }
+            ];
+
+            ball.animate(keyframes, {
+                duration: 2000,
+                fill: 'forwards'
+            });
+
+            setTimeout(() => {
+                ball.style.opacity = '0';
+                const actionInfoEl = document.getElementById("ACTION_INFO");
+                if (actionInfoEl) actionInfoEl.style.display = "none";
+                if (playerImage) playerImage.style.display = "none";
+                if (goalKeeperImage) goalKeeperImage.style.display = "none";
+                if (assistingPlayerImage) assistingPlayerImage.style.display = "none";
+            }, 4500);
+        }
+    }
 }
+
+
 
 function action() {
     switch (actionType) {
@@ -185,117 +220,145 @@ function action() {
 
 function throwMissedBall() {
     displayActionInfo();
-
-    const playerImage = document.getElementById((playerPosition+"_IMAGE"));
-    if(playerImageLink != null){
-        playerImage.src = playerImageLink ;
+    let positionString = "";
+    let opponentPositionString = "";
+    if (playerTeamName === homeTeamName) {
+        positionString += "HOME_";
+        opponentPositionString += "AWAY_";
     } else {
-        playerImage.src = "http://localhost:8080/assets/images/player/player.png";
+        positionString += "AWAY_";
+        opponentPositionString += "HOME_";
     }
 
-    playerImage.style.display = "block";
+    const playerImage = document.getElementById(`${positionString}${playerPosition}_IMAGE`);
+    if (playerImage) {
+        playerImage.src = playerImageLink;
+        playerImage.style.display = "unset";
+    }
 
-    const ball = document.getElementById('ball');
-    ball.style.opacity = '1';
+    const goalKeeperImage = document.getElementById(`${opponentPositionString}${goalKeeperPosition}_IMAGE`);
+    if (goalKeeperImage) {
+        goalKeeperImage.src = goalKeeperImageLink;
+        goalKeeperImage.style.display = "unset";
+    }
 
-    const fieldRect = document.querySelector('.field').getBoundingClientRect();
-    const playerRect = playerImage.getBoundingClientRect();
-    const startTop = `${(playerRect.top + playerRect.height / 2 - fieldRect.top) / fieldRect.height * 100}%`;
-    const startLeft = `${(playerRect.left + playerRect.width / 2 - fieldRect.left) / fieldRect.width * 100}%`;
+    const playerElement = document.getElementById(`${positionString}${playerPosition}`);
+    if (!playerElement) {
+        console.error('Player element not found:', `${positionString}${playerPosition}`);
+        return;
+    }
 
-    ball.style.top = startTop;
-    ball.style.left = startLeft;
-    ball.style.transform = 'translate(-50%, -50%)';
+    const assistingPlayerImage = document.getElementById(`${positionString}${assistingPlayerPosition}_IMAGE`);
+    if(assistingPlayerImage){
+        assistingPlayerImage.src = assistingPlayerImageLink;
+        assistingPlayerImage.style.display = "unset";
+    }
 
-    const missedSpots = [
-        { top: '-5%', left: '30%' },
-        { top: '-5%', left: '70%' }
-    ];
+    if (playerImage) {
 
-    const targetSpot = missedSpots[Math.floor(Math.random() * missedSpots.length)];
+        const ball = document.getElementById('ball');
+        if (ball) {
+            ball.style.opacity = '1';
 
-    const keyframes = [
-        { top: startTop, left: startLeft, transform: 'rotate(0deg)' },
-        { top: targetSpot.top, left: targetSpot.left, transform: 'rotate(360deg)' }
-    ];
+            const fieldRect = document.querySelector('.field').getBoundingClientRect();
+            const playerRect = playerImage.getBoundingClientRect();
+            const startTop = `${(playerRect.top + playerRect.height / 2 - fieldRect.top) / fieldRect.height * 100}%`;
+            const startLeft = `${(playerRect.left + playerRect.width / 2 - fieldRect.left) / fieldRect.width * 100}%`;
 
-    ball.animate(keyframes, {
-        duration: 2000,
-        fill: 'forwards'
-    }).onfinish = () => {
-        setTimeout(() => {
-            document.getElementById("ACTION_INFO").style.display = "none";
-            ball.style.opacity = '0';
-            playerImage.style.display = "none";
-        }, 4500);
-    };
+            ball.style.top = startTop;
+            ball.style.left = startLeft;
+            ball.style.transform = 'translate(-50%, -50%)';
+
+            const missedSpots = [
+                { top: '-5%', left: '30%' },
+                { top: '-5%', left: '70%' }
+            ];
+
+            const targetSpot = missedSpots[Math.floor(Math.random() * missedSpots.length)];
+
+            const keyframes = [
+                { top: startTop, left: startLeft, transform: 'rotate(0deg)' },
+                { top: targetSpot.top, left: targetSpot.left, transform: 'rotate(360deg)' }
+            ];
+
+            ball.animate(keyframes, {
+                duration: 2000,
+                fill: 'forwards'
+            }).onfinish = () => {
+                setTimeout(() => {
+                    const actionInfoEl = document.getElementById("ACTION_INFO");
+                    if (actionInfoEl) actionInfoEl.style.display = "none";
+                    ball.style.opacity = '0';
+                    playerImage.style.display = "none";
+                }, 4500);
+            };
+        }
+    }
 }
 
 function throwCaughtBall() {
     displayActionInfo();
 
-    const playerImage = document.getElementById((playerPosition + "_IMAGE"));
-    const goalKeeperImage = document.getElementById((goalKeeperPosition + "_IMAGE"));
+    const playerImage = document.getElementById(`${playerPosition}_IMAGE`);
+    const goalKeeperImage = document.getElementById(`${goalKeeperPosition}_IMAGE`);
 
-    if(playerImageLink != null){
-        playerImage.src = playerImageLink ;
-    } else {
-        playerImage.src = "http://localhost:8080/assets/images/player/player.png";
+    if (playerImage) {
+        playerImage.src = playerImageLink || "http://localhost:8080/assets/images/player/player.png";
+        playerImage.style.display = "block";
     }
 
-    if(goalKeeperImageLink != null) {
-        goalKeeperImage.src = goalKeeperImageLink;
-    } else {
-        goalKeeperImage.src = "http://localhost:8080/assets/images/player/player.png";
+    if (goalKeeperImage) {
+        goalKeeperImage.src = goalKeeperImageLink || "http://localhost:8080/assets/images/player/player.png";
+        goalKeeperImage.style.display = "block";
     }
-
-    playerImage.style.display = "block";
-    goalKeeperImage.style.display = "block";
 
     const ball = document.getElementById('ball');
-    const fieldRect = document.querySelector('.field').getBoundingClientRect();
-    const playerRect = playerImage.getBoundingClientRect();
-    const goalKeeperRect = goalKeeperImage.getBoundingClientRect();
+    if (ball) {
+        const fieldRect = document.querySelector('.field').getBoundingClientRect();
+        const playerRect = playerImage.getBoundingClientRect();
+        const goalKeeperRect = goalKeeperImage.getBoundingClientRect();
 
-    const ballStartPosition = {
-        x: ((playerRect.left + playerRect.width / 2) - fieldRect.left) / fieldRect.width * 100,
-        y: ((playerRect.top + playerRect.height / 2) - fieldRect.top) / fieldRect.height * 100
-    };
+        const ballStartPosition = {
+            x: ((playerRect.left + playerRect.width / 2) - fieldRect.left) / fieldRect.width * 100,
+            y: ((playerRect.top + playerRect.height / 2) - fieldRect.top) / fieldRect.height * 100
+        };
 
-    const ballEndPosition = {
-        x: ((goalKeeperRect.left + goalKeeperRect.width) - fieldRect.left) / fieldRect.width * 100,
-        y: ((goalKeeperRect.top + goalKeeperRect.height) - fieldRect.top) / fieldRect.height * 100
-    };
+        const ballEndPosition = {
+            x: ((goalKeeperRect.left + goalKeeperRect.width) - fieldRect.left) / fieldRect.width * 100,
+            y: ((goalKeeperRect.top + goalKeeperRect.height) - fieldRect.top) / fieldRect.height * 100
+        };
 
-    ball.style.left = `${ballStartPosition.x}%`;
-    ball.style.top = `${ballStartPosition.y}%`;
-    ball.style.opacity = '1';
-    ball.style.zIndex = '1000';
+        ball.style.left = `${ballStartPosition.x}%`;
+        ball.style.top = `${ballStartPosition.y}%`;
+        ball.style.opacity = '1';
+        ball.style.zIndex = '1000';
 
-    ball.animate([
-        {
-            offset: 0,
-            top: `${ballStartPosition.y}%`,
-            left: `${ballStartPosition.x}%`,
-            transform: 'translate(-50%, -50%) rotate(0deg)'
-        },
-        {
-            offset: 1,
-            top: `${ballEndPosition.y - 5}%`,
-            left: `${ballEndPosition.x - 5}%`,
-            transform: 'translate(-50%, -50%) rotate(360deg)'
-        }
-    ], {
-        duration: 2000,
-        fill: 'forwards'
-    }).onfinish = () => {
-        setTimeout(() => {
-            document.getElementById("ACTION_INFO").style.display = "none";
-            playerImage.style.display = "none";
-            goalKeeperImage.style.display = "none";
-            ball.style.opacity = '0';
-        }, 2500);
-    };
+        ball.animate([
+            {
+                offset: 0,
+                top: `${ballStartPosition.y}%`,
+                left: `${ballStartPosition.x}%`,
+                transform: 'translate(-50%, -50%) rotate(0deg)'
+            },
+            {
+                offset: 1,
+                top: `${ballEndPosition.y - 5}%`,
+                left: `${ballEndPosition.x - 5}%`,
+                transform: 'translate(-50%, -50%) rotate(360deg)'
+            }
+        ], {
+            duration: 2000,
+            fill: 'forwards'
+        }).onfinish = () => {
+            setTimeout(() => {
+                const actionInfoEl = document.getElementById("ACTION_INFO");
+                if (actionInfoEl) actionInfoEl.style.display = "none";
+                if (playerImage) playerImage.style.display = "none";
+                if (goalKeeperImage) goalKeeperImage.style.display = "none";
+                ball.style.opacity = '0';
+            }, 2500);
+        };
+    }
 }
 
 function throwReboundBallReturn(){
@@ -331,11 +394,10 @@ function checkGoal() {
 
         if (ballBounds && goalTopBounds && ballBounds.right > goalTopBounds.left && ballBounds.left < goalTopBounds.right &&
             ballBounds.bottom > goalTopBounds.top && ballBounds.top < goalTopBounds.bottom) {
-            console.log('Ball in top goal!');
 
         } else if (ballBounds && goalBottomBounds && ballBounds.right > goalBottomBounds.left && ballBounds.left < goalBottomBounds.right &&
             ballBounds.bottom > goalBottomBounds.top && ballBounds.top < goalBottomBounds.bottom) {
-            console.log('Ball in bottom goal!');
+
         }
 
         requestAnimationFrame(ballInGoal);
