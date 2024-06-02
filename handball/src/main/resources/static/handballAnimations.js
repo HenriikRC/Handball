@@ -55,7 +55,7 @@ function updateActionData(actionData) {
     assistingPlayerName = actionData.assistingPlayerName || null;
     assistingPlayerJerseyNumber = actionData.assistingPlayerJerseyNumber || null;
     assistingPlayerPosition = actionData.assistingPlayerPosition || null;
-    assistingPlayerTeamImageLink = actionData.assistingPlayerTeamImageLink || null;
+    assistingPlayerImageLink = actionData.assistingPlayerTeamImageLink || null;
 
     opponentTeamId = actionData.opponentTeamid || null;
     opponentTeamName = actionData.opponentTeamName || null;
@@ -97,7 +97,7 @@ function displayActionInfo() {
 
     const assistingPlayerDiv = document.getElementById("ASSISTING_PLAYER");
     if (assistingPlayerName != null) {
-        updatePlayerInfo('ASSISTING_PLAYER', assistingPlayerName, assistingPlayerJerseyNumber, assistingPlayerPosition , assistingPlayerTeamImageLink);
+        updatePlayerInfo('ASSISTING_PLAYER', assistingPlayerName, assistingPlayerJerseyNumber, assistingPlayerImageLink , playerTeamImageLink);
         assistingPlayerDiv.style.display = "flex";
     } else {
         assistingPlayerDiv.style.display = "none";
@@ -109,7 +109,6 @@ function displayActionInfo() {
     document.getElementById("THROWING_PLAYER_ACTION").innerText = actionType;
     document.getElementById("ACTION_INFO").style.display = "flex";
 
-    action();
 }
 
 

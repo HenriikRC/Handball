@@ -21,7 +21,7 @@ function fetchInitialMatchActions(matchId) {
                     const matchActionsContainer = document.getElementById('matchActionsContainer');
                     matchActions.forEach(action => {
                         const actionElement = createMatchActionElement(action, homeTeamName, awayTeamName);
-                        matchActionsContainer.appendChild(actionElement);
+                        matchActionsContainer.insertBefore(actionElement, matchActionsContainer.firstChild);
                         document.querySelectorAll('.matchEvent').forEach(function(element) {
                             element.style.listStyleType = 'none';
                         });
@@ -115,7 +115,7 @@ function createMatchActionElement(action, homeTeamName, awayTeamName) {
 function updateMatchActions(newMatchAction, homeTeamName, awayTeamName) {
     const matchActionsContainer = document.getElementById('matchActionsContainer');
     const actionElement = createMatchActionElement(newMatchAction, homeTeamName, awayTeamName);
-    matchActionsContainer.appendChild(actionElement);
+    matchActionsContainer.insertBefore(actionElement, matchActionsContainer.firstChild);
     document.querySelectorAll('.matchEvent').forEach(function(element) {
         element.style.listStyleType = 'none';
     });
