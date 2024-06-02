@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSSE(matchId);
 });
 
-
 function fetchInitialMatchActions(matchId) {
     fetch(`/api/v1/matches/${matchId}`)
         .then(response => response.json())
@@ -33,14 +32,11 @@ function fetchInitialMatchActions(matchId) {
 }
 
 function setupSSE(matchId) {
-    // Establish SSE connection
     const eventSource = new EventSource(`/api/v1/live/matchactions/${matchId}/stream`);
 
-    // Event listener for receiving match actions
     eventSource.addEventListener('message', function(event) {
         const matchAction = JSON.parse(event.data);
-        console.log('New match action received:', matchAction);
-        updateMatchActions(matchAction);
+        updateMatchActions(matchAction, homeTeamName, awayTeamName);
         const actionData = {
             teamId: matchAction.team?.id,
             teamName: matchAction.team?.name,
@@ -79,6 +75,7 @@ function setupSSE(matchId) {
     });
 }
 
+
 function createMatchActionElement(action, homeTeamName, awayTeamName) {
     let cssClass = 'centerContent';
     if (action.team) {
@@ -88,7 +85,7 @@ function createMatchActionElement(action, homeTeamName, awayTeamName) {
     let playerInfo = '';
     if (action.player) {
         playerInfo = `<div class="matchEventLine">
-                        <span><span>${action.team ? action.team.shortName : ''}</span>Player: <span>${action.player.name}</span></span><br>
+                        <span><span>${action.team ? action.team.shortName : ''}</span> Player: <span>${action.player.name}</span></span><br>
                       </div>`;
     }
 
@@ -103,7 +100,7 @@ function createMatchActionElement(action, homeTeamName, awayTeamName) {
     listItem.className = `matchEvent ${cssClass}`;
     listItem.innerHTML = `
         <div class="matchEventLine">
-            <span class="matchEventLine action">${action.matchActionType}</span>
+            <span class="matchEventLine action">${action.matchActionType}</span> <span class="matchEventTime">${action.matchTime}</span>
         </div>
         ${playerInfo}
         ${goalKeeperInfo}
@@ -111,6 +108,7 @@ function createMatchActionElement(action, homeTeamName, awayTeamName) {
 
     return listItem;
 }
+
 
 function updateMatchActions(newMatchAction, homeTeamName, awayTeamName) {
     const matchActionsContainer = document.getElementById('matchActionsContainer');

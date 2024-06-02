@@ -243,4 +243,9 @@ li::marker {
 .image {
     display: none;
 }
-
+.rightMarker {
+    text-align: right;
+}
+.leftMarker {
+    text-align: left;
+}
