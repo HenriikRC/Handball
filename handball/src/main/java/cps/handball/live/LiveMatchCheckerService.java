@@ -29,23 +29,19 @@ public class LiveMatchCheckerService {
         this.context = context;
     }
 
-    @Scheduled(fixedRate = 30000) //300000
+    @Scheduled(fixedRate = 30000)
     public void checkForLiveMatches() {
         List<Match> unfinishedMatches = matchService.findUnfinishedMatches();
         LocalDateTime currentTime = LocalDateTime.now();
-
         unfinishedMatches.forEach(match -> {
             Timestamp matchTimestamp = match.getMatchTime();
-
-
-            LocalDateTime matchTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(matchTimestamp.getTime()), ZoneId.systemDefault());
-
+            LocalDateTime matchTime = LocalDateTime.
+                    ofInstant(Instant.ofEpochMilli(matchTimestamp.getTime()), ZoneId.systemDefault());
             if (currentTime.plusMinutes(5).plusSeconds(30).isAfter(matchTime)) {
                 if (!activeScrapers.containsKey(match.getId())) {
                     LiveMatchScraperTask newTask = context.getBean(LiveMatchScraperTask.class);
                     newTask.startScraping(match);
                     activeScrapers.put(match.getId(), newTask);
-                    System.out.println("Match is live: " + match.getId());
                 }
             }
         });

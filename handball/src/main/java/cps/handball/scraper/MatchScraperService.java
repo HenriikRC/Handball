@@ -33,14 +33,9 @@ public class MatchScraperService {
     }
     public void scrape() {
         final String url = "https://tophaandbold.dk/kampprogram/herreligaen";
-
         try {
-
             Document doc = Jsoup.connect(url).get();
-
-
             Elements matchRows = doc.select(".match-program__row");
-
             for (Element row : matchRows) {
                 Match match = new Match();
 
@@ -88,20 +83,16 @@ public class MatchScraperService {
 
                 saveMatchWithTeams(match);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     @Transactional
     public void saveMatchWithTeams(Match match) {
         Team homeTeam = teamService.findOrCreateByName(match.getHomeTeam().getName());
         Team awayTeam = teamService.findOrCreateByName(match.getAwayTeam().getName());
-
         match.setHomeTeam(homeTeam);
         match.setAwayTeam(awayTeam);
-
         matchService.saveMatch(match);
     }
 }

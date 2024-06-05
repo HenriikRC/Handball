@@ -32,17 +32,14 @@ public class PlayerScraper {
             for (Element playerEl : playerElements) {
                 String playerInfo = playerEl.select(".team__player__name").text() + " " +
                         playerEl.select(".team__player__name__position").text();
-                String playerImageUrl = playerEl.select(".team__player__left .team__player__img").attr("src");
-
+                String playerImageUrl = playerEl.select(".team__player__left .team__player__img")
+                        .attr("src");
                 Player player = parsePlayerInfo(playerInfo, team);
-
-
                 if (player != null) {
                     playerService.savePlayer(player);
-                    //downloadAndSavePlayerImage(playerImageUrl, player);
+                    downloadAndSavePlayerImage(playerImageUrl, player);
                 } else {
-
-                    System.out.println("Skipping non-player entry or unable to parse player from: " + playerInfo);
+                    System.out.println("Skipping non-player: " + playerInfo);
                 }
             }
         } catch (IOException e) {
@@ -52,29 +49,24 @@ public class PlayerScraper {
 
 
     private Player parsePlayerInfo(String playerInfo, Team team) {
-
         if (!playerInfo.contains("#")) {
             System.out.println("Skipping non-player entry: " + playerInfo);
             return null;
         }
-
         String[] parts = playerInfo.split(" #");
         if (parts.length < 2 || !parts[1].contains(" ")) {
             System.out.println("Invalid player format: " + playerInfo);
             return null;
         }
-
         String name = parts[0].trim();
         String[] numberAndPosition = parts[1].split(" ", 2);
         int playerNumber = Integer.parseInt(numberAndPosition[0]);
         String positionString = numberAndPosition[1].trim();
-
         Player player = new Player();
         player.setName(name);
         player.setPlayerNumber(playerNumber);
         player.setPositionType(mapPositionStringToEnum(positionString));
         player.setTeam(team);
-
         return player;
     }
 
@@ -95,19 +87,15 @@ public class PlayerScraper {
         try {
             String fullImageUrl = "https://www.tophaandbold.dk" + playerImageUrl;
             URL imageUrl = new URL(fullImageUrl);
-
             String extension = playerImageUrl.substring(playerImageUrl.lastIndexOf("."));
-
             String basePath = System.getProperty("user.dir");
             String relativePath = "src/main/resources/public/assets/images/player/";
             String fileName = player.getId() + extension;
             String localFilePath = Paths.get(basePath, relativePath, fileName).toString();
-
             File directory = new File(Paths.get(basePath, relativePath).toString());
             if (!directory.exists()){
                 directory.mkdirs();
             }
-
             try (InputStream in = imageUrl.openStream(); OutputStream out = new FileOutputStream(localFilePath)) {
                 byte[] buffer = new byte[4096];
                 int bytesRead;
@@ -116,18 +104,14 @@ public class PlayerScraper {
                 }
             }
             System.out.println("Downloaded image to " + localFilePath);
-            // The path here should match how you've structured your static resources in Spring Boot
             String playerImageLink = "http://localhost:8080/assets/images/player/" + fileName;
-
             updatePlayerImageLink(player, playerImageLink);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
         private void updatePlayerImageLink(Player player, String playerImageLink) {
             player.setPlayerImageLink(playerImageLink);
-
             playerService.savePlayer(player);
         }
 }

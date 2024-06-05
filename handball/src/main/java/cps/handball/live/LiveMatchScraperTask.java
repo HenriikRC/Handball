@@ -46,11 +46,10 @@ public class LiveMatchScraperTask {
 
     @Transactional
     public void startScraping(Match match) {
-        //futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/10 * * * * *"));
+        futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/4 * * * * *"));
     }
 
     private void scrapeMatch(Match match) {
-        System.out.println("Scraping match data from: " + match.getMatchSiteLink());
         WebDriver driver = initSelenium();
         boolean isMatchEndFound = false;
         try {
@@ -61,7 +60,6 @@ public class LiveMatchScraperTask {
             }
             driver.get(matchSiteLink);
             Thread.sleep(2000);
-
             List<WebElement> matchBlocks = driver.findElements(By.cssSelector(".cd-timeline-block-center"));
             for (WebElement element : matchBlocks) {
                 WebElement timeElement = element.findElement(By.cssSelector(".cd-timeline-center-img"));
@@ -79,16 +77,13 @@ public class LiveMatchScraperTask {
                     parseMatchBlocks(match, element);
                 }
             }
-
             processMatchActions(driver, match, true);
             processMatchActions(driver, match, false);
-
             if (isMatchEndFound) {
                 System.out.println("MATCH END FOUND");
                 matchService.markMatchAsFinished(match.getId());
                 stopScraping(driver);
             }
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

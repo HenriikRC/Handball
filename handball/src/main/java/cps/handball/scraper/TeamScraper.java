@@ -50,7 +50,9 @@ public class TeamScraper {
             team.setName(teamPageDoc.title());
             team.setShortName(teamShortName);
             teamService.save(team);
-            String teamPageLink = teamPageDoc.select("a.ls-team__info__ul__li__link[href*='/tophaandbold_theme/teams/view']").attr("abs:href");
+            String teamPageLink = teamPageDoc.select(
+                    "a.ls-team__info__ul__li__link[href*='/tophaandbold_theme/teams/view']")
+                    .attr("abs:href");
             if (!teamPageLink.isEmpty()) {
                 playerScraper.scrapePlayers(teamPageLink, team);
             }
