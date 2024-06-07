@@ -46,7 +46,7 @@ public class LiveMatchScraperTask {
 
     @Transactional
     public void startScraping(Match match) {
-        //futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/4 * * * * *"));
+        futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/5 * * * * *"));
     }
 
     public void scrapeMatch(Match match) {
