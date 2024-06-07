@@ -90,7 +90,7 @@ public class PlayerScraper {
             String extension = playerImageUrl.substring(playerImageUrl.lastIndexOf("."));
             String basePath = System.getProperty("user.dir");
             String relativePath = "src/main/resources/public/assets/images/player/";
-            String fileName = player.getId() + extension;
+            String fileName = player.getTeam().getId() + "_" + player.getId() + extension;
             String localFilePath = Paths.get(basePath, relativePath, fileName).toString();
             File directory = new File(Paths.get(basePath, relativePath).toString());
             if (!directory.exists()){

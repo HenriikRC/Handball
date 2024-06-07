@@ -46,10 +46,10 @@ public class LiveMatchScraperTask {
 
     @Transactional
     public void startScraping(Match match) {
-        futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/4 * * * * *"));
+        //futureTask = taskScheduler.schedule(() -> scrapeMatch(match), new CronTrigger("*/4 * * * * *"));
     }
 
-    private void scrapeMatch(Match match) {
+    public void scrapeMatch(Match match) {
         WebDriver driver = initSelenium();
         boolean isMatchEndFound = false;
         try {
@@ -125,7 +125,7 @@ public class LiveMatchScraperTask {
         MatchActionDTO matchActionDTO = matchActionMapper.toDTO(databaseMatchAction);
         MatchActionEvent matchActionEvent = new MatchActionEvent(match.getId(), matchActionDTO);
         LOGGER.info("Publishing match action event for match ID: {}", match.getId());
-        eventPublisher.publishMatchActionEvent(matchActionEvent);
+        eventPublisher.notifyObservers(matchActionEvent);
     }
 
 
@@ -208,11 +208,7 @@ public class LiveMatchScraperTask {
     }
 
     private MatchActionType determineMatchActionTypeFromBlock(WebElement element) {
-        System.out.println("PRINTING ELEMENT BELOW");
-        System.out.println("Element: " + element.getText());
-        System.out.println("PRINTING TEXT BELOW");
         String text = element.getText().toUpperCase().trim();
-        System.out.println("Extracted text: '" + text + "'");
 
         if (text.contains("KAMP START")) {
             return MatchActionType.START;
@@ -263,7 +259,7 @@ public class LiveMatchScraperTask {
         MatchActionDTO matchActionDTO = matchActionMapper.toDTO(databaseMatchAction);
         MatchActionEvent matchActionEvent = new MatchActionEvent(match.getId(), matchActionDTO);
         LOGGER.info("Publishing match action event for match ID: {}", match.getId());
-        eventPublisher.publishMatchActionEvent(matchActionEvent);
+        eventPublisher.notifyObservers(matchActionEvent);
     }
 
     private WebDriver initSelenium() {

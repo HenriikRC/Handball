@@ -15,7 +15,6 @@ public class RouteController {
 
     @GetMapping("/live/match/{matchId}")
     public String liveMatchPage(@PathVariable String matchId){
-        System.out.println(matchId);
         return "/liveMatch.html";
     }
 

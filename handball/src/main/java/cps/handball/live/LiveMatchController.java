@@ -1,7 +1,5 @@
 package cps.handball.live;
 
-
-import jakarta.persistence.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -16,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @RestController
-public class LiveMatchController {
+public class LiveMatchController implements MatchActionObserver {
     private static final Logger logger = LoggerFactory.getLogger(LiveMatchController.class);
     private final ConcurrentMap<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
@@ -32,7 +30,7 @@ public class LiveMatchController {
         return emitter;
     }
 
-    @EventListener
+    @Override
     public void onMatchActionEvent(MatchActionEvent event) {
         Long matchId = event.getMatchId();
         Object matchAction = event.getMatchAction();
